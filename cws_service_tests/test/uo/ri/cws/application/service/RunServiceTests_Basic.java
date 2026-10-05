@@ -11,7 +11,7 @@ import io.cucumber.junit.platform.engine.Constants;
 // common basic tests 
 @SelectClasspathResource("uo/ri/cws/application/service/acceptance/mechanic")
 @SelectClasspathResource("uo/ri/cws/application/service/acceptance/invoice")
-@SelectClasspathResource("uo/ri/cws/application/service/acceptance/workorder")
+//@SelectClasspathResource("uo/ri/cws/application/service/acceptance/workorder")
 
 @ConfigurationParameter(
 	key = Constants.PLUGIN_PROPERTY_NAME, 

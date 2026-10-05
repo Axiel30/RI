@@ -1,5 +1,6 @@
 package uo.ri.cws.application.service;
 
+import uo.ri.cws.application.service.cashier.crud.CashierCrudServiceImpl;
 import uo.ri.cws.application.service.client.ClientCrudService;
 import uo.ri.cws.application.service.client.ClientHistoryService;
 import uo.ri.cws.application.service.invoice.InvoicingService;
@@ -69,8 +70,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
 
 	@Override
 	public InvoicingService forCreateInvoiceService() {
-		// TODO Auto-generated method stub
-		return null;
+		return new CashierCrudServiceImpl();
 	}
 
 }

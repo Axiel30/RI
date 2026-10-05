@@ -31,14 +31,14 @@ public class MechanicCrudServiceImpl implements MechanicCrudService {
 
 	@Override
 	public Optional<MechanicDto> findById(String id) throws BusinessException {
-		MechanicDto dto = new FindById(id).execute();
-		return Optional.of(dto);
+		Optional<MechanicDto> dto = new FindById(id).execute();
+		return dto;
 	}
 
 	@Override
 	public Optional<MechanicDto> findByNif(String nif) throws BusinessException {
-		MechanicDto dto = new ListMechanic(nif).execute();
-		return Optional.of(dto);
+		Optional<MechanicDto> dto = new ListMechanic(nif).execute();
+		return dto;
 	}
 
 	@Override
