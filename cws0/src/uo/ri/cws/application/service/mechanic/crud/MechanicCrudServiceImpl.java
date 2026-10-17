@@ -14,38 +14,36 @@ import uo.ri.cws.application.service.mechanic.crud.commands.UpdateMechanic;
 import uo.ri.util.exception.BusinessException;
 
 public class MechanicCrudServiceImpl implements MechanicCrudService {
+
 	private CommandExecutor executor = new CommandExecutor();
 
 	@Override
-	public MechanicDto create(MechanicDto dto) throws BusinessException {
-		return executor.execute(new AddMechanic(dto));
+	public MechanicDto create(MechanicDto mechanic) throws BusinessException {
+		return executor.execute(new AddMechanic(mechanic));
 	}
 
 	@Override
-	public void delete(String mechanicId) throws BusinessException {
-		new DeleteMechanic(mechanicId).execute();
+	public void delete(String idMechanic) throws BusinessException {
+		executor.execute(new DeleteMechanic(idMechanic));
 	}
 
 	@Override
-	public void update(MechanicDto dto) throws BusinessException {
-		new UpdateMechanic(dto).execute();
+	public void update(MechanicDto mechanic) throws BusinessException {
+		executor.execute(new UpdateMechanic(mechanic));
 	}
 
 	@Override
 	public Optional<MechanicDto> findById(String id) throws BusinessException {
-		Optional<MechanicDto> dto = new FindById(id).execute();
-		return dto;
+		return executor.execute(new FindById(id));
 	}
 
 	@Override
 	public Optional<MechanicDto> findByNif(String nif) throws BusinessException {
-		Optional<MechanicDto> dto = new ListMechanic(nif).execute();
-		return dto;
+		return executor.execute(new ListMechanic(nif));
 	}
 
 	@Override
 	public List<MechanicDto> findAll() throws BusinessException {
-		return new ListAllMechanics().execute();
+		return executor.execute(new ListAllMechanics());
 	}
-
 }

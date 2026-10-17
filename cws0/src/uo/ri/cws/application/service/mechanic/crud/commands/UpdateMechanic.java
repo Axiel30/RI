@@ -1,54 +1,47 @@
 package uo.ri.cws.application.service.mechanic.crud.commands;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
-import uo.ri.cws.application.persistence.util.jdbc.Jdbc;
+import uo.ri.conf.Factories;
+import uo.ri.cws.application.persistence.mechanic.MechanicGateway;
+import uo.ri.cws.application.persistence.mechanic.MechanicGateway.MechanicRecord;
+import uo.ri.cws.application.persistence.util.command.Command;
 import uo.ri.cws.application.service.mechanic.MechanicCrudService.MechanicDto;
+import uo.ri.util.assertion.ArgumentChecks;
 import uo.ri.util.exception.BusinessException;
 
-public class UpdateMechanic {
-	private static final String TMECHANICS_UPDATE = "update TMechanics set nif = ?, name = ?, surname = ?, "
-			+ "version = version + 1, updatedat = ? where id = ? and version = ?";
-
+public class UpdateMechanic implements Command<Void> {
+	private MechanicGateway mg = Factories.persistence.forMechanic();
 	private MechanicDto dto;
 
 	public UpdateMechanic(MechanicDto dto) {
-		if (dto == null)
-			throw new IllegalArgumentException("DTO cannot be null");
-		if (dto.id == null || dto.id.trim().isEmpty())
-			throw new IllegalArgumentException("Id cannot be null or blank");
-		if (dto.nif == null || dto.nif.trim().isEmpty())
-			throw new IllegalArgumentException("NIF cannot be null or blank");
-		if (dto.name == null || dto.name.trim().isEmpty())
-			throw new IllegalArgumentException("Name cannot be null or blank");
-		if (dto.surname == null || dto.surname.trim().isEmpty())
-			throw new IllegalArgumentException("Surname cannot be null or blank");
+		ArgumentChecks.isNotNull(dto, "DTO cannot be null");
+		ArgumentChecks.isNotBlank(dto.id, "Id cannot be null or blank");
+		ArgumentChecks.isNotBlank(dto.nif, "NIF cannot be null or blank");
+		ArgumentChecks.isNotBlank(dto.name, "Name cannot be null or blank");
+		ArgumentChecks.isNotBlank(dto.surname, "Surname cannot be null or blank");
 		this.dto = dto;
 	}
 
-	public void execute() throws BusinessException {
-		try (Connection c = Jdbc.createThreadConnection()) {
-			try (PreparedStatement pst = c.prepareStatement(TMECHANICS_UPDATE)) {
-				pst.setString(1, dto.nif);
-				pst.setString(2, dto.name);
-				pst.setString(3, dto.surname);
-				pst.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
-				pst.setString(5, dto.id);
-				// Se pasa la versión del DTO como sexto parámetro
-				pst.setLong(6, dto.version);
-
-				int rowsAffected = pst.executeUpdate();
-				if (rowsAffected == 0) {
-					// Si no actualiza ninguna fila, o no existe o la versión cambió (fue modificado
-					// por otro usuario)
-					throw new BusinessException("The mechanic does not exist or has been modified concurrently");
-				}
-			}
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
+	@Override
+	public Void execute() throws BusinessException {
+		Optional<MechanicRecord> om = mg.findById(dto.id);
+		if (om.isEmpty()) {
+			throw new BusinessException("The mechanic does not exist");
 		}
+
+		MechanicRecord record = om.get();
+		if (dto.version != record.version) {
+			throw new BusinessException("The mechanic has been modified concurrently");
+		}
+
+		record.nif = dto.nif;
+		record.name = dto.name;
+		record.surname = dto.surname;
+		record.updatedAt = LocalDateTime.now();
+
+		mg.update(record);
+		return null;
 	}
 }

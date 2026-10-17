@@ -2,9 +2,11 @@ package uo.ri.cws.application.persistence;
 
 import uo.ri.cws.application.persistence.intervention.InterventionGateway;
 import uo.ri.cws.application.persistence.invoice.InvoiceGateway;
+import uo.ri.cws.application.persistence.invoice.impl.InvoiceGatewayImpl;
 import uo.ri.cws.application.persistence.mechanic.MechanicGateway;
 import uo.ri.cws.application.persistence.mechanic.impl.MechanicGatewayImpl;
 import uo.ri.cws.application.persistence.workorder.WorkOrderGateway;
+import uo.ri.cws.application.persistence.workorder.impl.WorkOrderGatewayImpl;
 
 public class PersistenceFactoryImpl implements PersistenceFactory {
 
@@ -15,14 +17,12 @@ public class PersistenceFactoryImpl implements PersistenceFactory {
 
 	@Override
 	public WorkOrderGateway forWorkOrder() {
-		// TODO Auto-generated method stub
-		return null;
+		return new WorkOrderGatewayImpl();
 	}
 
 	@Override
 	public InvoiceGateway forInvoice() {
-		// TODO Auto-generated method stub
-		return null;
+		return new InvoiceGatewayImpl();
 	}
 
 	@Override
