@@ -6,9 +6,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import uo.ri.cws.application.persistence.util.jdbc.Jdbc;
 import uo.ri.util.console.Console;
 import uo.ri.util.exception.BusinessException;
-import uo.ri.util.jdbc.Jdbc;
 import uo.ri.util.menu.Action;
 
 public class AddMechanicAction implements Action {

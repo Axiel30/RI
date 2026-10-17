@@ -10,7 +10,6 @@ import uo.ri.util.exception.PersistenceException;
 public class CommandExecutor {
 
     public <T> T execute(Command<T> cmd) throws BusinessException {
-
         try (Connection c = Jdbc.createThreadConnection();) {
             c.setAutoCommit(false);
 

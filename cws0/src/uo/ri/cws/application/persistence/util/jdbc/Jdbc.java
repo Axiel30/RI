@@ -1,8 +1,10 @@
-package uo.ri.util.jdbc;
+package uo.ri.cws.application.persistence.util.jdbc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import uo.ri.util.jdbc.ConnectionProperties;
 
 public class Jdbc {
 

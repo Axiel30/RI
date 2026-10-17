@@ -5,9 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import uo.ri.cws.application.persistence.util.jdbc.Jdbc;
 import uo.ri.cws.application.service.mechanic.MechanicCrudService.MechanicDto;
 import uo.ri.util.exception.BusinessException;
-import uo.ri.util.jdbc.Jdbc;
 
 public class UpdateMechanic {
 	private static final String TMECHANICS_UPDATE = "update TMechanics set nif = ?, name = ?, surname = ?, "
@@ -16,10 +16,6 @@ public class UpdateMechanic {
 	private MechanicDto dto;
 
 	public UpdateMechanic(MechanicDto dto) {
-		this.dto = dto;
-	}
-
-	public void execute() throws BusinessException {
 		if (dto == null)
 			throw new IllegalArgumentException("DTO cannot be null");
 		if (dto.id == null || dto.id.trim().isEmpty())
@@ -30,7 +26,10 @@ public class UpdateMechanic {
 			throw new IllegalArgumentException("Name cannot be null or blank");
 		if (dto.surname == null || dto.surname.trim().isEmpty())
 			throw new IllegalArgumentException("Surname cannot be null or blank");
+		this.dto = dto;
+	}
 
+	public void execute() throws BusinessException {
 		try (Connection c = Jdbc.createThreadConnection()) {
 			try (PreparedStatement pst = c.prepareStatement(TMECHANICS_UPDATE)) {
 				pst.setString(1, dto.nif);

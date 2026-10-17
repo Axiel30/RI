@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import uo.ri.cws.application.persistence.util.jdbc.Jdbc;
 import uo.ri.util.exception.BusinessException;
-import uo.ri.util.jdbc.Jdbc;
 
 public class DeleteMechanic {
 	private static final String TMECHANICS_DELETE = "DELETE FROM TMECHANICS WHERE ID = ?";

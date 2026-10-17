@@ -7,8 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import uo.ri.cws.application.persistence.util.jdbc.Jdbc;
 import uo.ri.util.exception.BusinessException;
-import uo.ri.util.jdbc.Jdbc;
 
 public class SettleInvoice {
     private String invoiceId;
