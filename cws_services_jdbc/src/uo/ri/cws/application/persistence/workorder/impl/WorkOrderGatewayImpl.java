@@ -88,6 +88,15 @@ public class WorkOrderGatewayImpl implements WorkOrderGateway {
 	}
 
 	@Override
+	public List<WorkOrderRecord> findByIds(List<String> workOrderIds) throws PersistenceException {
+		List<WorkOrderRecord> result = new ArrayList<>();
+		for (String id : workOrderIds) {
+			findById(id).ifPresent(result::add);
+		}
+		return result;
+	}
+
+	@Override
 	public List<WorkOrderRecord> findAll() throws PersistenceException {
 		Connection c = Jdbc.getCurrentConnection();
 		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TWORKORDERS_FINDALL"))) {
@@ -123,11 +132,20 @@ public class WorkOrderGatewayImpl implements WorkOrderGateway {
 	}
 
 	@Override
-	public List<WorkOrderRecord> findByIds(List<String> workOrderIds) throws PersistenceException {
-		List<WorkOrderRecord> result = new ArrayList<>();
-		for (String id : workOrderIds) {
-			findById(id).ifPresent(result::add);
+	public List<WorkOrderRecord> findByClientId(String clientId) throws PersistenceException {
+		Connection c = Jdbc.getCurrentConnection();
+		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TWORKORDERS_FIND_BY_CLIENT_ID"))) {
+			pst.setString(1, clientId);
+			try (ResultSet rs = pst.executeQuery()) {
+				List<WorkOrderRecord> records = new ArrayList<>();
+				WorkOrderRecordAssembler assembler = new WorkOrderRecordAssembler(WorkOrderRecord::new);
+				while (rs.next()) {
+					records.add(assembler.toRecord(rs));
+				}
+				return records;
+			}
+		} catch (SQLException e) {
+			throw new PersistenceException(e);
 		}
-		return result;
 	}
 }

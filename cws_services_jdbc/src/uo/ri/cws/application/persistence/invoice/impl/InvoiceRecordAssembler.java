@@ -38,4 +38,17 @@ public class InvoiceRecordAssembler extends BaseRecordAssembler<InvoiceRecord> {
 		
 		return record;
 	}
+	
+//	@Override
+//    protected InvoiceRecord fromResultSet(ResultSet rs) throws SQLException {
+//        InvoiceRecord record = super.fromResultSet(rs);
+//        record.number = rs.getLong("number");
+//        record.date = rs.getDate("date").toLocalDate();
+//        record.vatRate = rs.getDouble("vatrate");
+//        record.vatAmount = rs.getDouble("vatamount");
+//        record.subtotal = rs.getDouble("subtotal");
+//        record.total = rs.getDouble("total");
+//        record.state = rs.getString("state");
+//        return record;
+//    }
 }

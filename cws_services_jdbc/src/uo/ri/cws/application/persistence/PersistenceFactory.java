@@ -1,8 +1,11 @@
 package uo.ri.cws.application.persistence;
 
+import uo.ri.cws.application.persistence.client.ClientGateway;
 import uo.ri.cws.application.persistence.intervention.InterventionGateway;
 import uo.ri.cws.application.persistence.invoice.InvoiceGateway;
 import uo.ri.cws.application.persistence.mechanic.MechanicGateway;
+import uo.ri.cws.application.persistence.paymentmean.PaymentMeanGateway;
+import uo.ri.cws.application.persistence.recommendation.RecommendationGateway;
 import uo.ri.cws.application.persistence.workorder.WorkOrderGateway;
 
 public interface PersistenceFactory {
@@ -11,6 +14,9 @@ public interface PersistenceFactory {
 		WorkOrderGateway forWorkOrder();
 		InvoiceGateway forInvoice();
 		InterventionGateway forIntervention();
+		ClientGateway forClient();
+		RecommendationGateway forRecommendation();
+		PaymentMeanGateway forPaymentMean();
 		
 //		SparePartGateway forSparePart();
 //		SubstitutionGateway forSubstitutionsGateway();

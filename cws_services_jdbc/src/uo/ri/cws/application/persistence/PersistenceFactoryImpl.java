@@ -1,10 +1,16 @@
 package uo.ri.cws.application.persistence;
 
+import uo.ri.cws.application.persistence.client.ClientGateway;
+import uo.ri.cws.application.persistence.client.impl.ClientGatewayImpl;
 import uo.ri.cws.application.persistence.intervention.InterventionGateway;
 import uo.ri.cws.application.persistence.invoice.InvoiceGateway;
 import uo.ri.cws.application.persistence.invoice.impl.InvoiceGatewayImpl;
 import uo.ri.cws.application.persistence.mechanic.MechanicGateway;
 import uo.ri.cws.application.persistence.mechanic.impl.MechanicGatewayImpl;
+import uo.ri.cws.application.persistence.paymentmean.PaymentMeanGateway;
+import uo.ri.cws.application.persistence.paymentmean.impl.PaymentMeanGatewayImpl;
+import uo.ri.cws.application.persistence.recommendation.RecommendationGateway;
+import uo.ri.cws.application.persistence.recommendation.impl.RecommendationGatewayImpl;
 import uo.ri.cws.application.persistence.workorder.WorkOrderGateway;
 import uo.ri.cws.application.persistence.workorder.impl.WorkOrderGatewayImpl;
 
@@ -30,5 +36,19 @@ public class PersistenceFactoryImpl implements PersistenceFactory {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public ClientGateway forClient() {
+	    return new ClientGatewayImpl();
+	}
 
+	@Override
+	public RecommendationGateway forRecommendation() {
+	    return new RecommendationGatewayImpl();
+	}
+
+	@Override
+	public PaymentMeanGateway forPaymentMean() {
+	    return new PaymentMeanGatewayImpl();
+	}
 }

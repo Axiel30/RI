@@ -14,6 +14,8 @@ public interface WorkOrderGateway extends Gateway<WorkOrderRecord> {
 
 	List<WorkOrderRecord> findByIds(List<String> workOrderIds) throws PersistenceException;
 
+	List<WorkOrderRecord> findByClientId(String clientId);
+
 	public static class WorkOrderRecord extends BaseRecord {
 		public BigDecimal amount;
 		public LocalDateTime date;
