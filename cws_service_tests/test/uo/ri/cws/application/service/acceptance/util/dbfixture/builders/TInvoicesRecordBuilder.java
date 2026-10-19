@@ -44,10 +44,10 @@ public class TInvoicesRecordBuilder {
 		return this;
 	}
 
-//	public TInvoicesRecordBuilder withVatRate(BigDecimal rate) {
-//		record.vatrate_value = rate;
-//		return this;
-//	}
+	public TInvoicesRecordBuilder withVatRate(BigDecimal rate) {
+		record.vatrate = rate;
+		return this;
+	}
 
 	// ---- invoice metadata ----
 
@@ -78,6 +78,11 @@ public class TInvoicesRecordBuilder {
 
 	public TInvoicesRecordBuilder withState(String state) {
 		record.state = state;
+		return this;
+	}
+
+	public TInvoicesRecordBuilder withUsedForVoucher(boolean usedForVoucher) {
+		record.usedForVoucher = usedForVoucher;
 		return this;
 	}
 
@@ -122,6 +127,7 @@ public class TInvoicesRecordBuilder {
 		r.entitystate = "ENABLED";
 		r.number = 1L;
 		r.state = "ISSUED";
+		r.usedForVoucher = false;
 
 		r.version = 1L;
 

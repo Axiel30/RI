@@ -22,14 +22,14 @@ public class SettleInvoiceAction implements Action {
 
 	@Override
 	public void execute() throws Exception {
-		Long number = Console.readLong("Invoice number?");
+		Long number = Console.readLong("Invoice number");
 		Optional<InvoiceDto> oi = cs.findInvoiceByNumber(number);
 		UserInteractionChecks.exists( oi, "There is no such invoice");
 		InvoiceDto invoice = oi.get();
 
 		Printer.printInvoice( invoice );
 
-		String nif = Console.readString("Client nif?");
+		String nif = Console.readString("Client nif");
 		List<PaymentMeanDto> means = cs.findPayMeansByClientNif(nif);
 		UserInteractionChecks.isFalse( means.isEmpty(),
 				"The client has no payment means or the nif is wrong"
@@ -61,11 +61,11 @@ public class SettleInvoiceAction implements Action {
 	}
 
 	private BigDecimal askForAmount() {
-		return Console.readBigDecimal("Amount to charge? ");
+		return Console.readBigDecimal("Amount to charge");
 	}
 
 	private String askForPaymentMeanId() {
-		return Console.readString("Payment mean id? ");
+		return Console.readString("Payment mean id");
 	}
 
 	private void showPaymentMeans(List<PaymentMeanDto> means) {

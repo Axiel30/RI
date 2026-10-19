@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.annotation.processing.Generated;
 
+import uo.ri.cws.application.service.acceptance.util.dtobuilders.CreditCardNumberGenerator;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TCreditCardsRecord;
 
 @Generated("LLM")
@@ -39,7 +40,7 @@ public class TCreditCardsRecordBuilder {
 	private TCreditCardsRecord createDefaultRecord() {
 		TCreditCardsRecord defaultRecord = new TCreditCardsRecord();
 		defaultRecord.id = UUID.randomUUID().toString();
-		defaultRecord.number = "0000000000000000";
+		defaultRecord.number = CreditCardNumberGenerator.generate();
 		defaultRecord.type = "VISA";
 		defaultRecord.validThru = new Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000); // 1 year from now
 		return defaultRecord;

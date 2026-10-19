@@ -9,7 +9,7 @@ public class TVehiclesRecord {
     public String id;
     public Timestamp createdAt;
     public Timestamp updatedAt;
-    public Long version;
+    public long version;
     public String entityState;
 
     public String make;

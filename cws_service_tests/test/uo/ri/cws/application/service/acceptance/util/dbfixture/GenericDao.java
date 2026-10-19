@@ -25,7 +25,7 @@ public class GenericDao<T> {
     }
 
     public void insert(T obj) {
-        String sql = insertSql();
+        String sql = composeInsertSql();
         execute(conn -> {
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 setParams(ps, obj, "");
@@ -36,7 +36,7 @@ public class GenericDao<T> {
     }
 
 	public void update(T obj) {
-        String sql = updateSql();
+        String sql = composeUpdateSql();
 		execute(conn -> {
 			try (PreparedStatement ps = conn.prepareStatement(sql)) {
 		        Field idField = type.getField("id");
@@ -135,7 +135,7 @@ public class GenericDao<T> {
 		return i;
 	}
 
-	private String insertSql() {
+	private String composeInsertSql() {
 		StringJoiner cols = new StringJoiner(", ");
         StringJoiner vals = new StringJoiner(", ");
         for (Field f : fields) {
@@ -146,7 +146,7 @@ public class GenericDao<T> {
         return "INSERT INTO " + tableName + " (" + cols + ") VALUES (" + vals + ")";
 	}
 
-	private String updateSql() {
+	private String composeUpdateSql() {
 		StringJoiner setClause = new StringJoiner(", ");
         for (Field f : fields) {
             if (!f.getName().equals("id")) {

@@ -30,7 +30,7 @@ public class ScenarioIC2 {
 
 	@Given("[I.C.2] a client registered with a vehicle and a list of several approved workorders")
     public void givenClientWithVehicleAndFinishedWorkorders() {
-    	workOrders = DbFixtures.someWorkordersApprovedWithVehicleAndClient();
+    	workOrders = DbFixtures.someWorkOrdersApprovedWithVehicleAndClient();
     }
 
     @When("[I.C.2] I create an invoice for the workorders")

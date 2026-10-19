@@ -38,7 +38,5 @@ public class Db {
 
 	public static void clearTables() {
 		new GenericDao<Void>(Void.class).clearTables();
-		// TODO Auto-generated method stub
-		
 	}
 }

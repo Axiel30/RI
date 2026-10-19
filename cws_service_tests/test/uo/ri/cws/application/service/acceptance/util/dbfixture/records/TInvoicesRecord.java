@@ -13,10 +13,11 @@ public class TInvoicesRecord {
     public Timestamp createdat;
     public Timestamp updatedat;
     public String entitystate;
-    public Long version;
+    public long version;
 
     public Long number;
     public String state;
+    public boolean usedForVoucher;
 
     public BigDecimal total;
     public BigDecimal subtotal;

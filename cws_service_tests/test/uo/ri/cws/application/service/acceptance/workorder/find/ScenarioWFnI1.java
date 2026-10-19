@@ -28,7 +28,7 @@ public class ScenarioWFnI1 {
 	@Given("[W.FnI.1] a client registered with a vehicle and a list of several approved workorders")
     public void givenClientWithVehicleAndSeveralFinishedWorkorders() {
 		client = DbFixtures.aClient();
-    	workOrders = DbFixtures.someWorkordersApprovedWithVehicleForClient( client.id );
+    	workOrders = DbFixtures.someWorkOrdersApprovedWithVehicleForClient( client.id );
    }
 
     @When("[W.FnI.1] I search not invoiced workorders by client nif")

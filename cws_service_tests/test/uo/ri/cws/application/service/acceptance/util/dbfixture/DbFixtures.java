@@ -4,22 +4,43 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TCashesRecordBuilder;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TChargesRecordBuilder;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TClientsRecordBuilder;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TCreditCardsRecordBuilder;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TInterventionsRecordBuilder;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TInvoicesRecordBuilder;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TMechanicsRecordBuilder;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TPaymentMeansRecordBuilder;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TRecommendationsRecordBuilder;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TVehicleTypesRecordBuilder;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TVehiclesRecordBuilder;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TVouchersRecordBuilder;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.builders.TWorkOrdersRecordBuilder;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TCashesRecord;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TChargesRecord;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TClientsRecord;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TCreditCardsRecord;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TInterventionsRecord;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TInvoicesRecord;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TMechanicsRecord;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TPaymentMeansRecord;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TRecommendationsRecord;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TVehicleTypesRecord;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TVehiclesRecord;
+import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TVouchersRecord;
 import uo.ri.cws.application.service.acceptance.util.dbfixture.records.TWorkOrdersRecord;
 
 public class DbFixtures {
+	public static final boolean PAID = true;
+	public static final boolean NOT_PAID = false;
+	public static final boolean USED_FOR_VOUCHER = true;
+	public static final boolean NOT_USED_FOR_VOUCHER = false;
 
 	public static TMechanicsRecord aMechanic() {
 		TMechanicsRecord mechanic = new TMechanicsRecordBuilder().build();
@@ -87,18 +108,18 @@ public class DbFixtures {
 		return wo;
 	}
 
-	public static List<TWorkOrdersRecord> someWorkordersApprovedWithVehicleAndClient() {
+	public static List<TWorkOrdersRecord> someWorkOrdersApprovedWithVehicleAndClient() {
 		TClientsRecord client = aClient();
-		return someWorkordersApprovedWithVehicleForClient(client.id);
+		return someWorkOrdersApprovedWithVehicleForClient(client.id);
 	}
 	
 	
-	public static List<TWorkOrdersRecord> someWorkordersFinishedWithVehicleAndClient() {
+	public static List<TWorkOrdersRecord> someWorkOrdersFinishedWithVehicleAndClient() {
 		TClientsRecord client = aClient();
-		return someWorkordersFinishedWithVehicleForClient(client.id);
+		return someWorkOrdersFinishedWithVehicleForClient(client.id);
 	}
 
-	public static List<TWorkOrdersRecord> someWorkordersFinishedWithVehicleForClient(
+	public static List<TWorkOrdersRecord> someWorkOrdersFinishedWithVehicleForClient(
 			String clientId) {
 
 		TVehiclesRecord vehicle = aVehicleForClient(clientId);
@@ -109,7 +130,7 @@ public class DbFixtures {
 			);
 	}
 
-	public static List<TWorkOrdersRecord> someWorkordersApprovedWithVehicleForClient(
+	public static List<TWorkOrdersRecord> someWorkOrdersApprovedWithVehicleForClient(
 			String clientId) {
 
 		TVehiclesRecord vehicle = aVehicleForClient(clientId);
@@ -203,6 +224,297 @@ public class DbFixtures {
 		TClientsRecord client = new TClientsRecordBuilder().build();
 		Db.insert(client);
 		return client;
+	}
+
+	public static List<TClientsRecord> someClients() {
+		return List.of(aClient(), aClient(), aClient());
+	}
+
+	public static TClientsRecord aClientWithCash() {
+		TClientsRecord client = aClient();
+		aCashForClient(client.id);
+		return client;
+	}
+
+	public static TPaymentMeansRecord aCashForClient(String clientId) {
+		TPaymentMeansRecord paymentMean = new TPaymentMeansRecordBuilder()
+				.forClientId(clientId)
+				.withDtype("Cash")
+				.build();
+		TCashesRecord cash = new TCashesRecordBuilder()
+				.withId(paymentMean.id)
+				.build();
+
+		Db.insert(paymentMean);
+		Db.insert(cash);
+		return paymentMean;
+	}
+
+	public static TPaymentMeansRecord aCreditCardForClient(String clientId) {
+		TPaymentMeansRecord paymentMean = new TPaymentMeansRecordBuilder()
+				.forClientId(clientId)
+				.withDtype("CreditCard")
+				.build();
+		TCreditCardsRecord card = new TCreditCardsRecordBuilder()
+				.withId(paymentMean.id)
+				.build();
+
+		Db.insert(paymentMean);
+		Db.insert(card);
+		return paymentMean;
+	}
+
+	public static TPaymentMeansRecord aCreditCardForClientValidThru(
+			String clientId, YearMonth validThru) {
+		TPaymentMeansRecord paymentMean = aCreditCardForClient(clientId);
+		TCreditCardsRecord card = Db.findById(TCreditCardsRecord.class, paymentMean.id);
+		card.validThru = java.sql.Date.valueOf(validThru.atEndOfMonth());
+		Db.update(card);
+		return paymentMean;
+	}
+
+	public static TPaymentMeansRecord aVoucherForClient(String clientId) {
+		return aVoucherForClientOf(
+				clientId,
+				new BigDecimal("100.00"),
+				new BigDecimal("100.00"),
+				"Default Voucher"
+			);
+	}
+
+	public static TPaymentMeansRecord aVoucherForClientOf(
+			String clientId,
+			BigDecimal total,
+			BigDecimal available,
+			String description) {
+
+		BigDecimal consumed = total.subtract(available);
+		TPaymentMeansRecord paymentMean = new TPaymentMeansRecordBuilder()
+				.forClientId(clientId)
+				.withDtype("Voucher")
+				.withAccumulated(consumed)
+				.build();
+		TVouchersRecord voucher = new TVouchersRecordBuilder()
+				.withId(paymentMean.id)
+				.withAvailable(available)
+				.withDescription(description)
+				.build();
+
+		Db.insert(paymentMean);
+		Db.insert(voucher);
+		return paymentMean;
+	}
+
+	public static List<TPaymentMeansRecord> somePaymentMeansForClient(String clientId) {
+		return List.of(
+				aCashForClient(clientId),
+				aCreditCardForClient(clientId),
+				aCreditCardForClient(clientId),
+				aVoucherForClient(clientId),
+				aVoucherForClient(clientId)
+			);
+	}
+
+	public static TPaymentMeansRecord aChargedCreditCardForClient(String clientId) {
+		TPaymentMeansRecord paymentMean = aCreditCardForClient(clientId);
+		aPaidInvoiceForPaymentMean(paymentMean);
+		return paymentMean;
+	}
+
+	public static TRecommendationsRecord aRecommendationForClients(
+			String recommenderId, String recommendedId) {
+		return aRecommendationForClients(recommenderId, recommendedId, NOT_USED_FOR_VOUCHER);
+	}
+
+	public static TRecommendationsRecord aRecommendationForClients(
+			String recommenderId,
+			String recommendedId,
+			boolean usedForVoucher) {
+
+		TRecommendationsRecord recommendation = new TRecommendationsRecordBuilder()
+				.forRecommenderId(recommenderId)
+				.forRecommendedId(recommendedId)
+				.withUsedForVoucher(usedForVoucher)
+				.build();
+		Db.insert(recommendation);
+		return recommendation;
+	}
+
+	public static List<TRecommendationsRecord> someRecommendationsForClientOf(
+			String recommenderId,
+			int recommendationsWithPaidInvoice,
+			int recommendationsWithoutPaidInvoice,
+			boolean usedForVoucher) {
+
+		List<TRecommendationsRecord> result = new ArrayList<>();
+		for (int i = 0; i < recommendationsWithPaidInvoice; i++) {
+			TClientsRecord recommended = aClient();
+			anInvoiceForClientOf(recommended.id, new BigDecimal("100.00"), PAID, NOT_USED_FOR_VOUCHER);
+			result.add(aRecommendationForClients(recommenderId, recommended.id, usedForVoucher));
+		}
+		for (int i = 0; i < recommendationsWithoutPaidInvoice; i++) {
+			TClientsRecord recommended = aClient();
+			anInvoiceForClientOf(recommended.id, new BigDecimal("100.00"), NOT_PAID, NOT_USED_FOR_VOUCHER);
+			result.add(aRecommendationForClients(recommenderId, recommended.id, usedForVoucher));
+		}
+		return result;
+	}
+
+	public static List<TWorkOrdersRecord> someWorkOrdersInvoicedForClientOf(
+			String clientId,
+			int paidInvoices,
+			int unpaidInvoices,
+			boolean usedForVoucher) {
+
+		List<TWorkOrdersRecord> result = new ArrayList<>();
+		for (int i = 0; i < paidInvoices; i++) {
+			result.add(
+				aWorkOrderInvoicedForClientOf(clientId, new BigDecimal("100.00"), PAID, usedForVoucher)
+			  );
+		}
+		for (int i = 0; i < unpaidInvoices; i++) {
+			result.add(
+				aWorkOrderInvoicedForClientOf(clientId, new BigDecimal("100.00"), NOT_PAID, usedForVoucher)
+			 );
+		}
+		return result;
+	}
+
+	public static TInvoicesRecord anInvoiceForClientOf(
+			String clientId,
+			BigDecimal amount,
+			boolean paid,
+			boolean usedForVoucher) {
+
+		TWorkOrdersRecord workOrder = aWorkOrderInvoicedForClientOf(clientId, amount, paid, NOT_USED_FOR_VOUCHER);
+		TInvoicesRecord invoice = Db.findById(TInvoicesRecord.class, workOrder.invoice_Id);
+		invoice.usedForVoucher = usedForVoucher;
+		Db.update(invoice);
+		return invoice;
+	}
+
+	public static TInvoicesRecord anInvoiceIssuedForClientOf(
+			String clientId, BigDecimal subtotal) {
+		
+		BigDecimal vat = subtotal
+				.multiply(new BigDecimal("0.21"))
+				.setScale(2, RoundingMode.HALF_EVEN);
+		
+		BigDecimal total = subtotal.add(vat);
+		
+		TInvoicesRecord invoice = new TInvoicesRecordBuilder()
+				.withNumber(Math.abs(UUID.randomUUID().getMostSignificantBits()))
+				.withSubtotal(subtotal)
+				.withVatRate(new BigDecimal("21"))
+				.withVatAmount(vat)
+				.withTotal(total)
+				.build();
+		Db.insert(invoice);
+
+		TVehiclesRecord vehicle = aVehicleForClient(clientId);
+		TWorkOrdersRecord workOrder = new TWorkOrdersRecordBuilder()
+				.forVehicleId(vehicle.id)
+				.forInvoiceId(invoice.id)
+				.withAmount(subtotal)
+				.invoiced()
+				.build();
+		Db.insert(workOrder);
+		return invoice;
+	}
+
+	public static TWorkOrdersRecord aWorkOrderInvoicedForClientOf(
+			String clientId,
+			BigDecimal invoiceAmount,
+			boolean paid,
+			boolean usedForVoucher) {
+
+		TInvoicesRecordBuilder invoiceBuilder = new TInvoicesRecordBuilder()
+				.withNumber(Math.abs(UUID.randomUUID().getMostSignificantBits()))
+				.withSubtotal(invoiceAmount)
+				.withTotal(invoiceAmount);
+		if (paid) {
+			invoiceBuilder.paid();
+		} else {
+			invoiceBuilder.notPaid();
+		}
+		TInvoicesRecord invoice = invoiceBuilder.build();
+		Db.insert(invoice);
+
+		if (paid) {
+			TPaymentMeansRecord cash = aCashForClient(clientId);
+			cash.accumulated = invoiceAmount;
+			Db.update(cash);
+			TChargesRecord charge = new TChargesRecordBuilder()
+					.withAmount(invoiceAmount)
+					.forInvoiceId(invoice.id)
+					.forPaymentMeanId(cash.id)
+					.build();
+			Db.insert(charge);
+		}
+
+		TVehiclesRecord vehicle = aVehicleForClient(clientId);
+		TWorkOrdersRecord workOrder = new TWorkOrdersRecordBuilder()
+				.forVehicleId(vehicle.id)
+				.forInvoiceId(invoice.id)
+				.withAmount(invoiceAmount)
+				.withUsedForVoucher(usedForVoucher)
+				.invoiced()
+				.build();
+		Db.insert(workOrder);
+		return workOrder;
+	}
+
+	public static TClientsRecord aClientRecommendedBy(String recommenderId) {
+		TClientsRecord recommended = aClient();
+		aRecommendationForClients(recommenderId, recommended.id);
+		return recommended;
+	}
+
+	public static List<TClientsRecord> someClientsRecommendedBy(String recommenderId) {
+		return List.of(
+				aClientRecommendedBy(recommenderId),
+				aClientRecommendedBy(recommenderId),
+				aClientRecommendedBy(recommenderId)
+			);
+	}
+
+	public static TClientsRecord aClientWithMadeAndReceivedRecommendations() {
+		TClientsRecord client = aClientWithCash();
+		TClientsRecord recommender = aClient();
+		TClientsRecord recommended = aClient();
+
+		aRecommendationForClients(recommender.id, client.id);
+		aRecommendationForClients(client.id, recommended.id);
+		return client;
+	}
+
+	public static TClientsRecord aClientWithPaidInvoice() {
+		TClientsRecord client = aClient();
+		TPaymentMeansRecord cash = aCashForClient(client.id);
+		aPaidInvoiceForPaymentMean(cash);
+		return client;
+	}
+
+	public static TInvoicesRecord aPaidInvoiceForPaymentMean(TPaymentMeansRecord paymentMean) {
+
+		BigDecimal amount = new BigDecimal("100.00");
+		TInvoicesRecord invoice = new TInvoicesRecordBuilder()
+				.withNumber(Math.abs(UUID.randomUUID().getMostSignificantBits()))
+				.withSubtotal(amount)
+				.withTotal(amount)
+				.paid()
+				.build();
+		TChargesRecord charge = new TChargesRecordBuilder()
+				.withAmount(amount)
+				.forInvoiceId(invoice.id)
+				.forPaymentMeanId(paymentMean.id)
+				.build();
+
+		paymentMean.accumulated = amount;
+		Db.update(paymentMean);
+		Db.insert(invoice);
+		Db.insert(charge);
+		return invoice;
 	}
 
 	private static void sleep(int miliseconds) {

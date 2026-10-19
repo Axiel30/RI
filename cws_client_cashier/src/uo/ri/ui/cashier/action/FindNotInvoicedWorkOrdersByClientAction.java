@@ -23,7 +23,7 @@ public class FindNotInvoicedWorkOrdersByClientAction implements Action {
 		List<InvoicingWorkOrderDto> reps = cs.findNotInvoicedWorkOrdersByClientNif( nif );
 
 		if (reps.size() == 0) {
-			Console.printf("There is no pending work orders\n");
+			Console.println("There are no pending work orders");
 			return;
 		}
 

@@ -10,7 +10,7 @@ public class TClientsRecord {
     public Timestamp createdAt;
     public String entityState;
     public Timestamp updatedAt;
-    public Long version;
+    public long version;
 
     public String nif;
     public String name;

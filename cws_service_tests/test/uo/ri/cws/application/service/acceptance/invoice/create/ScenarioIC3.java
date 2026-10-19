@@ -21,7 +21,7 @@ public class ScenarioIC3 {
 
     @Given("[I.C.3] a client registered with a vehicle and a list of several finished workorders")
     public void givenClientWithVehicleAndFinishedWorkorders() {
-        workOrders = DbFixtures.someWorkordersFinishedWithVehicleAndClient();
+        workOrders = DbFixtures.someWorkOrdersFinishedWithVehicleAndClient();
     }
 
     @When("[I.C.3] I try to create an invoice including one non existent workorder id")

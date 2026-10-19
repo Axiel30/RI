@@ -18,20 +18,19 @@ public interface InvoicingService {
 
 	/**
 	 * Creates an invoice for the work orders indicated by its id. All the
-	 * 		work orders must exist and be in FINISHED state.
+	 * 		work orders must exist and be in APPROVED state.
 	 * 
 	 * @param workOrderIds, the ids of the work orders to be included
 	 * @return the fully filled dto of the newly generated invoice
 	 * @throws BusinessException if
-	 * 	- Any of the indicated work orders are not in FINISHED state
+	 * 	- Any of the indicated work orders are not in APPROVED state
 	 * 	- There not exist any of the ids indicated
 	 * @throws IllegalArgumentException if 
 	 * 	- the list of workOrderIds is null
 	 *  - the list of workOrderIds is empty
 	 *  - any of the workOrderIds is null
 	 */
-	InvoiceDto create(List<String> workOrderIds)
-			throws BusinessException;
+	InvoiceDto create(List<String> workOrderIds) throws BusinessException;
 
 	/**
 	 * Returns a list with info of all the work orders of all the client's
@@ -42,8 +41,7 @@ public interface InvoicingService {
 	 * @throws BusinessException DOES NOT
 	 * @throws IllegalArgumentException if the nif is null, or does not match the formal
 	 */
-	List<InvoicingWorkOrderDto> findWorkOrdersByClientNif(String nif)
-			throws BusinessException;
+	List<InvoicingWorkOrderDto> findWorkOrdersByClientNif(String nif) throws BusinessException;
 
 	/**
 	 * Returns a list with not invoiced work orders of all the client's vehicles
@@ -52,8 +50,7 @@ public interface InvoicingService {
 	 * @throws BusinessException DOES NOT
 	 * @throws IllegalArgumentException if nif is null, or does not match the formal 
 	 */
-	List<InvoicingWorkOrderDto> findNotInvoicedWorkOrdersByClientNif(String nif)
-			throws BusinessException;
+	List<InvoicingWorkOrderDto> findNotInvoicedWorkOrdersByClientNif(String nif) throws BusinessException;
 
 	/**
 	 * Returns a list with info of all the work orders of a vehicle
@@ -62,8 +59,7 @@ public interface InvoicingService {
 	 * @throws BusinessException DOES NOT
 	 * @throws IllegalArgumentException if plate is null, or does not match the formal 
 	 */
-	List<InvoicingWorkOrderDto> findWorkOrdersByPlateNumber(String plate)
-			throws BusinessException;
+	List<InvoicingWorkOrderDto> findWorkOrdersByPlateNumber(String plate) throws BusinessException;
 
 	/**
 	 * @param number, of the invoice
@@ -80,8 +76,7 @@ public interface InvoicingService {
 	 * @throws BusinessException DOES NOT
 	 * @throws IllegalArgumentException if nif is null, or does not match the formal
 	 */
-	List<PaymentMeanDto> findPayMeansByClientNif(String nif)
-			throws BusinessException;
+	List<PaymentMeanDto> findPayMeansByClientNif(String nif) throws BusinessException;
 
 	/**
 	 * Creates the charges against the indicated payment means (with the amount
@@ -111,11 +106,9 @@ public interface InvoicingService {
 	 *        - any of the payment mean ids is null
 	 *        - any of the amounts is null
 	 */
-	void settleInvoice(String invoiceId, Map<String, BigDecimal> charges)
-			throws BusinessException;
+	void settleInvoice(String invoiceId, Map<String, BigDecimal> charges) throws BusinessException;
 
 	public static class InvoiceDto {
-
 	    public String id;              // surrogate id (UUID)
 	    public long version;
 

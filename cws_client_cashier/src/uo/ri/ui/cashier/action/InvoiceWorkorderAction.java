@@ -31,7 +31,7 @@ public class InvoiceWorkorderAction implements Action {
 
 	private boolean moreWorkOrders() {
 		return Console
-				.readString("more work orders? (y/n) ")
+				.readString("More work orders? (y/n)")
 				.equalsIgnoreCase("y");
 	}
 

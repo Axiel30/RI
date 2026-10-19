@@ -11,10 +11,10 @@ public class TSubstitutionsRecord {
     public Timestamp createdAt;
     public String entityState;
     public Timestamp updatedAt;
-    public Long version;
+    public long version;
 
     public BigDecimal price;
-    public Integer quantity;
+    public int quantity;
     public String intervention_Id;
     public String sparePart_Id;
 }

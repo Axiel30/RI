@@ -1,5 +1,6 @@
 package uo.ri.ui.util;
 
+import uo.ri.cws.application.service.client.ClientCrudService.ClientDto;
 import uo.ri.cws.application.service.vehicle.VehicleCrudService.VehicleDto;
 import uo.ri.cws.application.service.workorder.WorkOrderCrudService.WorkOrderDto;
 import uo.ri.util.console.Console;
@@ -24,6 +25,23 @@ public class Printer {
 				, v.plate
 				, v.make
 				, v.model
+			);
+	}
+
+	public static void printClient(ClientDto c) {
+
+		Console.printf(
+				"\t%s %-10.10s %-15.15s %-25.25s %-20.20s %-15.15s %-15.15s %-10.10s %-15.15s %-25.25s\n",
+				c.id,
+				c.nif,
+				c.name,
+				c.surname,
+				c.addressStreet,
+				c.addressCity,
+				c.addressCountry,
+				c.addressZipcode,
+				c.phone,
+				c.email
 			);
 	}
 

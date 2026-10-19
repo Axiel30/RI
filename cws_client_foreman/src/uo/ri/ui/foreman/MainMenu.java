@@ -1,6 +1,6 @@
 package uo.ri.ui.foreman;
 
-import uo.ri.ui.foreman.cliente.ClientsMenu;
+import uo.ri.ui.foreman.client.ClientsMenu;
 import uo.ri.ui.foreman.reception.ReceptionMenu;
 import uo.ri.ui.foreman.vehicle.VehiclesMenu;
 import uo.ri.util.menu.BaseMenu;

@@ -21,7 +21,7 @@ public class FindWorkOrdersByClientAction implements Action {
 		List<InvoicingWorkOrderDto> reps = cs.findWorkOrdersByClientNif( nif );
 
 		if (reps.size() == 0) {
-			Console.printf("There is not work orders\n");
+			Console.println("There are no work orders");
 			return;
 		}
 

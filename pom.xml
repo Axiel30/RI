@@ -11,8 +11,7 @@
 	<modules>
 		<module>cws_util</module>
 		<module>cws_service_interfaces</module>
-		<module>cws0</module>
-		<!--module>cws_services_jdbc</module-->
+		<module>cws_services_jdbc</module>
 		<module>cws_service_tests</module>
 		<module>cws_client_manager</module>
 		<module>cws_client_cashier</module>
@@ -27,7 +26,6 @@
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test</testSourceDirectory>
-		<outputDirectory>bin</outputDirectory>
 		
 		<resources>
 			<resource>
@@ -43,9 +41,6 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
-<!--
-					<verbose>true</verbose>
--->
 					<source>21</source>
 					<target>21</target>
 				</configuration>

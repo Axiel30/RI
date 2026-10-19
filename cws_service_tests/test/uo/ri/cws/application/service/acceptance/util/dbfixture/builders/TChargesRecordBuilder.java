@@ -19,7 +19,7 @@ public class TChargesRecordBuilder {
 	}
 
 	public TChargesRecordBuilder withAmount(BigDecimal amount) {
-		record.amount = amount;
+		record.charge = amount;
 		return this;
 	}
 
@@ -60,7 +60,7 @@ public class TChargesRecordBuilder {
 	private TChargesRecord createDefaultRecord() {
 		TChargesRecord defaultRecord = new TChargesRecord();
 		defaultRecord.id = UUID.randomUUID().toString();
-		defaultRecord.amount = BigDecimal.ZERO; 
+		defaultRecord.charge = BigDecimal.ZERO; 
 		defaultRecord.createdAt = new Timestamp(System.currentTimeMillis());
 		defaultRecord.entityState = "ENABLED";
 		defaultRecord.updatedAt = new Timestamp(System.currentTimeMillis());

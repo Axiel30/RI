@@ -32,6 +32,7 @@ public interface MechanicCrudService {
 	 * 		- the mechanic does not exist
 	 *      - the mechanic has workorders assigned
 	 *      - the mechanic has interventions done
+	 *      - the mechanic has contracts
 	 * @throws IllegalArgumentException if the id is null
 	 */
 	void delete(String mechanicId) throws BusinessException;
@@ -63,7 +64,8 @@ public interface MechanicCrudService {
 	Optional<MechanicDto> findByNif(String nif) throws BusinessException;
 
 	/**
-	 * @return the list of all mechanics. It might be an empty list if 
+	 * @return the list of all mechanics without regarding their contract 
+	 * state or if they have contract or not. It might be an empty list if 
 	 * there is no mechanic.
 	 *
 	 * @throws BusinessException DOES NOT

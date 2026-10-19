@@ -1,54 +1,14 @@
 package uo.ri.ui.util;
 
-import java.util.List;
+import java.math.BigDecimal;
 
-import uo.ri.cws.application.service.invoice.InvoicingService.InvoiceDto;
-import uo.ri.cws.application.service.invoice.InvoicingService.PaymentMeanDto;
 import uo.ri.cws.application.service.mechanic.MechanicCrudService.MechanicDto;
+import uo.ri.cws.application.service.paymentmean.VoucherGenerationService.VoucherDto;
+import uo.ri.cws.application.service.paymentmean.VoucherGenerationService.VoucherSummaryDto;
 import uo.ri.cws.application.service.vehicletype.VehicleTypeCrudService.VehicleTypeDto;
-import uo.ri.cws.application.service.workorder.WorkOrderCrudService.WorkOrderDto;
 import uo.ri.util.console.Console;
 
 public class Printer {
-
-	public static void printInvoice(InvoiceDto invoice) {
-
-		Console.printf("Invoice #: %d\n", 				invoice.number );
-		Console.printf("\tDate: %1$td/%1$tm/%1$tY\n", 	invoice.date);
-		Console.printf("\tTotal: %.2f €\n", 			invoice.subtotal);
-		Console.printf("\tTax amount: %s%n €\n",		invoice.vatAmount );
-		Console.printf("\tTotal, tax inc.: %s €\n", 	invoice.total );
-		Console.printf("\tState: %s\n", 				invoice.state );
-	}
-
-	public static void printPaymentMeans(List<PaymentMeanDto> medios) {
-		Console.println();
-		Console.println("Available payment means");
-
-		Console.printf("\t%s \t%-8.8s \t%s \n", "Id", "Type", "Acummulated");
-		for (PaymentMeanDto medio : medios) {
-			printPaymentMean( medio );
-		}
-	}
-
-	private static void printPaymentMean(PaymentMeanDto medio) {
-		Console.printf("\t%s \t%-8.8s \t%s \n"
-				, medio.id
-				, medio.getClass().getName()  // not the best...
-				, medio.accumulated
-		);
-	}
-
-	public static void printWorkOrder(WorkOrderDto rep) {
-
-		Console.printf("\t%s \t%-40.40s \t%td/%<tm/%<tY \t%-12.12s \t%.2f\n"
-				, rep.id
-				, rep.description
-				, rep.date
-				, rep.state
-				, rep.amount
-		);
-	}
 
 	public static void printMechanic(MechanicDto m) {
 
@@ -57,6 +17,39 @@ public class Printer {
 				, m.nif
 				, m.name
 				, m.surname
+			);
+	}
+
+	public static void printVoucher(VoucherDto voucher) {
+
+		Console.printf("\t%s %-12.12s %-35.35s %10.2f %10.2f\n",
+				voucher.id,
+				voucher.code,
+				voucher.description,
+				voucher.accumulatedAmount,
+				voucher.availableAmount
+			);
+	}
+
+	public static void printVoucherTotals(int quantity, BigDecimal total,
+			BigDecimal consumed, BigDecimal available) {
+
+		Console.printf("\n\tQuantity: %d\n", quantity);
+		Console.printf("\tTotal amount: %.2f\n", total);
+		Console.printf("\tConsumed amount: %.2f\n", consumed);
+		Console.printf("\tAvailable amount: %.2f\n", available);
+	}
+
+	public static void printVoucherSummary(VoucherSummaryDto row) {
+
+		Console.printf("\t%-10.10s %-15.15s %-25.25s %5d %10.2f %10.2f %10.2f\n",
+				row.nif(),
+				row.name(),
+				row.surname(),
+				row.issuedQty(),
+				row.totalAmount(),
+				row.consumedAmount(),
+				row.availableAmount()
 			);
 	}
 

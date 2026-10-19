@@ -11,7 +11,7 @@ public class TVehicleTypesRecord {
     public Timestamp createdAt;
     public String entityState;
     public Timestamp updatedAt;
-    public Long version;
+    public long version;
 
     public String name;
     public BigDecimal price_Per_Hour;

@@ -54,6 +54,11 @@ public class TWorkOrdersRecordBuilder {
 		return this;
 	}
 
+	public TWorkOrdersRecordBuilder withUsedForVoucher(boolean usedForVoucher) {
+		record.usedForVoucher = usedForVoucher;
+		return this;
+	}
+
 	public TWorkOrdersRecordBuilder withUpdatedAt(Timestamp updatedAt) {
 		record.updatedAt = updatedAt;
 		return this;
@@ -92,6 +97,7 @@ public class TWorkOrdersRecordBuilder {
 		defaultRecord.version = 1L;
 
 		defaultRecord.state = "OPEN";
+		defaultRecord.usedForVoucher = false;
 		defaultRecord.total_amount = BigDecimal.ZERO;
 		defaultRecord.date = new Timestamp(System.currentTimeMillis());
 		defaultRecord.description = "Default Description";
