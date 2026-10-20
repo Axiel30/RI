@@ -11,7 +11,7 @@ public interface RecommendationGateway extends Gateway<RecommendationRecord> {
 	void markAsUsed(String id);
 
 	public static class RecommendationRecord extends BaseRecord {
-		public String sponsor_id;
+		public String recommender_id;
 		public String recommended_id;
 		public boolean usedForVoucher;
 	}

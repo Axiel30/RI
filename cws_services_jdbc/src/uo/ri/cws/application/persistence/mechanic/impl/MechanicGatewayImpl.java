@@ -51,9 +51,9 @@ public class MechanicGatewayImpl implements MechanicGateway {
 	public void update(MechanicRecord t) throws PersistenceException {
 		Connection c = Jdbc.getCurrentConnection();
 		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TMECHANICS_UPDATE"))) {
-			pst.setString(1, t.nif);
-			pst.setString(2, t.name);
-			pst.setString(3, t.surname);
+			pst.setString(1, t.name);
+			pst.setString(2, t.surname);
+			pst.setString(3, t.nif);
 			pst.setTimestamp(4, Timestamp.valueOf(t.updatedAt != null ? t.updatedAt : LocalDateTime.now()));
 			pst.setString(5, t.id);
 
