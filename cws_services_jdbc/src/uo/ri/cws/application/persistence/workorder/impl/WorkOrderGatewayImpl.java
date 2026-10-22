@@ -1,12 +1,9 @@
 package uo.ri.cws.application.persistence.workorder.impl;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,135 +14,113 @@ import uo.ri.util.exception.PersistenceException;
 
 public class WorkOrderGatewayImpl implements WorkOrderGateway {
 
-	@Override
-	public void add(WorkOrderRecord t) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TWORKORDERS_ADD"))) {
-			pst.setString(1, t.id);
-			pst.setBigDecimal(2, t.amount);
-			pst.setTimestamp(3, Timestamp.valueOf(t.date));
-			pst.setString(4, t.description);
-			pst.setString(5, t.state);
-			pst.setString(6, t.invoice_id);
-			pst.setString(7, t.mechanic_id);
-			pst.setString(8, t.vehicle_id);
-			pst.setLong(9, t.version);
-			pst.setTimestamp(10, Timestamp.valueOf(t.createdAt));
-			pst.setTimestamp(11, Timestamp.valueOf(t.updatedAt));
-			pst.setString(12, t.entityState);
+	private final WorkOrderRecordAssembler assembler = new WorkOrderRecordAssembler();
 
+	@Override
+	public void add(WorkOrderRecord workOrder) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TWORKORDERS_ADD"))) {
+			pst.setString(1, workOrder.id);
+			pst.setTimestamp(2, Timestamp.valueOf(workOrder.date));
+			pst.setString(3, workOrder.description);
+			pst.setBigDecimal(4, workOrder.amount);
+			pst.setString(5, workOrder.state);
+			pst.setLong(6, workOrder.version);
+			pst.setTimestamp(7, Timestamp.valueOf(workOrder.createdAt));
+			pst.setTimestamp(8, Timestamp.valueOf(workOrder.updatedAt));
+			pst.setString(9, workOrder.entityState);
+			pst.setString(10, workOrder.invoiceId);
+			pst.setString(11, workOrder.mechanicId);
+			pst.setString(12, workOrder.vehicleId);
 			pst.executeUpdate();
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public void remove(String id) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TWORKORDERS_REMOVE"))) {
+	public void remove(String id) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TWORKORDERS_REMOVE"))) {
 			pst.setString(1, id);
 			pst.executeUpdate();
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public void update(WorkOrderRecord t) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TWORKORDERS_UPDATE"))) {
-			pst.setString(1, t.description);
-			pst.setBigDecimal(2, t.amount);
-			pst.setString(3, t.state);
-			pst.setString(4, t.invoice_id);
-			pst.setString(5, t.mechanic_id);
-			pst.setString(6, t.vehicle_id);
-			pst.setTimestamp(7, Timestamp.valueOf(t.updatedAt != null ? t.updatedAt : LocalDateTime.now()));
-			pst.setString(8, t.id);
-
+	public void update(WorkOrderRecord workOrder) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TWORKORDERS_UPDATE"))) {
+			pst.setString(1, workOrder.description);
+			pst.setBigDecimal(2, workOrder.amount);
+			pst.setString(3, workOrder.state);
+			pst.setString(4, workOrder.invoiceId);
+			pst.setString(5, workOrder.mechanicId);
+			pst.setString(6, workOrder.vehicleId);
+			pst.setTimestamp(7, Timestamp.valueOf(workOrder.updatedAt));
+			pst.setString(8, workOrder.id);
 			pst.executeUpdate();
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public Optional<WorkOrderRecord> findById(String id) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TWORKORDERS_FINDBYID"))) {
+	public Optional<WorkOrderRecord> findById(String id) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TWORKORDERS_FINDBYID"))) {
 			pst.setString(1, id);
 			try (ResultSet rs = pst.executeQuery()) {
-				if (rs.next()) {
-					WorkOrderRecordAssembler assembler = new WorkOrderRecordAssembler(WorkOrderRecord::new);
-					return Optional.of(assembler.toRecord(rs));
-				}
-				return Optional.empty();
+				return assembler.toOptionalRecord(rs);
 			}
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public List<WorkOrderRecord> findByIds(List<String> workOrderIds) throws PersistenceException {
-		List<WorkOrderRecord> result = new ArrayList<>();
-		for (String id : workOrderIds) {
-			findById(id).ifPresent(result::add);
-		}
-		return result;
-	}
+	public List<WorkOrderRecord> findAll() {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TWORKORDERS_FINDALL")); ResultSet rs = pst.executeQuery()) {
+			return assembler.toRecordList(rs);
 
-	@Override
-	public List<WorkOrderRecord> findAll() throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TWORKORDERS_FINDALL"))) {
-			try (ResultSet rs = pst.executeQuery()) {
-				List<WorkOrderRecord> records = new ArrayList<>();
-				WorkOrderRecordAssembler assembler = new WorkOrderRecordAssembler(WorkOrderRecord::new);
-				while (rs.next()) {
-					records.add(assembler.toRecord(rs));
-				}
-				return records;
-			}
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public List<WorkOrderRecord> findNotInvoicedByClientNif(String nif) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TWORKORDERS_FIND_NOT_INVOICED"))) {
+	public List<WorkOrderRecord> findNotInvoicedByClientNif(String nif) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TWORKORDERS_FINDNOTINVOICEDBYCLIENTNIF"))) {
 			pst.setString(1, nif);
 			try (ResultSet rs = pst.executeQuery()) {
-				List<WorkOrderRecord> records = new ArrayList<>();
-				WorkOrderRecordAssembler assembler = new WorkOrderRecordAssembler(WorkOrderRecord::new);
-				while (rs.next()) {
-					records.add(assembler.toRecord(rs));
-				}
-				return records;
+				return assembler.toRecordList(rs);
 			}
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public List<WorkOrderRecord> findByClientId(String clientId) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TWORKORDERS_FIND_BY_CLIENT_ID"))) {
-			pst.setString(1, clientId);
+	public boolean existsByMechanicId(String mechanicId) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TWORKORDERS_EXISTSBYMECHANICID"))) {
+			pst.setString(1, mechanicId);
 			try (ResultSet rs = pst.executeQuery()) {
-				List<WorkOrderRecord> records = new ArrayList<>();
-				WorkOrderRecordAssembler assembler = new WorkOrderRecordAssembler(WorkOrderRecord::new);
-				while (rs.next()) {
-					records.add(assembler.toRecord(rs));
-				}
-				return records;
+				return rs.next();
 			}
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
+
 }

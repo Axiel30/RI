@@ -1,12 +1,9 @@
 package uo.ri.cws.application.persistence.client.impl;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,91 +14,98 @@ import uo.ri.util.exception.PersistenceException;
 
 public class ClientGatewayImpl implements ClientGateway {
 
-	@Override
-	public void add(ClientRecord t) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TCLIENTS_ADD"))) {
-			pst.setString(1, t.id);
-			pst.setString(2, t.nif);
-			pst.setString(3, t.name);
-			pst.setString(4, t.surname);
-			pst.setString(5, t.email);
-			pst.setString(6, t.phone);
-			pst.setString(7, t.city);
-			pst.setString(8, t.street);
-			pst.setLong(9, t.version > 0 ? t.version : 1L);
-			
-			// Protegemos contra nulos usando la fecha actual si no vienen del test
-			Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-			pst.setTimestamp(10, t.createdAt != null ? Timestamp.valueOf(t.createdAt) : now);
-			pst.setTimestamp(11, t.updatedAt != null ? Timestamp.valueOf(t.updatedAt) : now);
-			pst.setString(12, "ENABLED"); // o t.entityState si lo tienes disponible
+	private final ClientRecordAssembler assembler = new ClientRecordAssembler();
 
+	@Override
+	public void add(ClientRecord client) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TCLIENTS_ADD"))) {
+			pst.setString(1, client.id);
+			pst.setString(2, client.nif);
+			pst.setString(3, client.name);
+			pst.setString(4, client.surname);
+			pst.setString(5, client.email);
+			pst.setString(6, client.phone);
+			pst.setString(7, client.street);
+			pst.setString(8, client.city);
+			pst.setString(9, client.postalCode);
+			pst.setString(10, client.country);
+			pst.setLong(11, client.version);
+			pst.setTimestamp(12, Timestamp.valueOf(client.createdAt));
+			pst.setTimestamp(13, Timestamp.valueOf(client.updatedAt));
+			pst.setString(14, client.entityState);
 			pst.executeUpdate();
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
-	@Override
-	public void remove(String id) throws PersistenceException {
-	}
 
 	@Override
-	public void update(ClientRecord t) throws PersistenceException {
-	}
-
-	@Override
-	public Optional<ClientRecord> findById(String id) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TCLIENTS_FINDBYID"))) {
+	public void remove(String id) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TCLIENTS_REMOVE"))) {
 			pst.setString(1, id);
-			try (ResultSet rs = pst.executeQuery()) {
-				return rs.next() ? Optional.of(fromResultSet(rs)) : Optional.empty();
-			}
+			pst.executeUpdate();
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public Optional<ClientRecord> findByNif(String nif) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TCLIENTS_FINDBYNIF"))) {
-			pst.setString(1, nif);
-			try (ResultSet rs = pst.executeQuery()) {
-				return rs.next() ? Optional.of(fromResultSet(rs)) : Optional.empty();
-			}
+	public void update(ClientRecord client) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TCLIENTS_UPDATE"))) {
+			pst.setString(1, client.nif);
+			pst.setString(2, client.name);
+			pst.setString(3, client.surname);
+			pst.setString(4, client.email);
+			pst.setString(5, client.phone);
+			pst.setString(6, client.street);
+			pst.setString(7, client.city);
+			pst.setString(8, client.postalCode);
+			pst.setString(9, client.country);
+			pst.setTimestamp(10, Timestamp.valueOf(client.updatedAt));
+			pst.setString(11, client.id);
+			pst.executeUpdate();
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public List<ClientRecord> findAll() throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		List<ClientRecord> res = new ArrayList<>();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TCLIENTS_FINDALL"));
-				ResultSet rs = pst.executeQuery()) {
-			while (rs.next()) {
-				res.add(fromResultSet(rs));
-			}
-			return res;
+	public Optional<ClientRecord> findById(String id) {
+		return findOne("TCLIENTS_FINDBYID", id);
+	}
+
+	@Override
+	public Optional<ClientRecord> findByNif(String nif) {
+		return findOne("TCLIENTS_FINDBYNIF", nif);
+	}
+
+	@Override
+	public List<ClientRecord> findAll() {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TCLIENTS_FINDALL")); ResultSet rs = pst.executeQuery()) {
+			return assembler.toRecordList(rs);
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
-	private ClientRecord fromResultSet(ResultSet rs) throws SQLException {
-		ClientRecord r = new ClientRecord();
-		r.id = rs.getString("id");
-		r.version = rs.getLong("version");
-		r.nif = rs.getString("nif");
-		r.name = rs.getString("name");
-		r.surname = rs.getString("surname");
-		r.email = rs.getString("email");
-		r.phone = rs.getString("phone");
-		r.city = rs.getString("city");
-		r.street = rs.getString("street");
-		return r;
+	private Optional<ClientRecord> findOne(String query, String arg) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection().prepareStatement(Queries.getSQLSentence(query))) {
+			pst.setString(1, arg);
+			try (ResultSet rs = pst.executeQuery()) {
+				return assembler.toOptionalRecord(rs);
+			}
+
+		} catch (SQLException e) {
+			throw new PersistenceException(e);
+		}
 	}
+
 }

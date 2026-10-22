@@ -6,13 +6,14 @@ import uo.ri.conf.Factories;
 import uo.ri.cws.application.persistence.mechanic.MechanicGateway;
 import uo.ri.cws.application.persistence.util.command.Command;
 import uo.ri.cws.application.service.mechanic.MechanicCrudService.MechanicDto;
-import uo.ri.util.exception.BusinessException;
 
 public class ListAllMechanics implements Command<List<MechanicDto>> {
-	private MechanicGateway mg = Factories.persistence.forMechanic();
+
+	private final MechanicGateway mechanics = Factories.persistence.forMechanic();
 
 	@Override
-	public List<MechanicDto> execute() throws BusinessException {
-		return MechanicDtoAssembler.toDtoList(mg.findAll());
+	public List<MechanicDto> execute() {
+		return MechanicDtoAssembler.toDtoList(mechanics.findAll());
 	}
+
 }

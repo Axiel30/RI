@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import uo.ri.conf.Factories;
 import uo.ri.cws.application.persistence.invoice.InvoiceGateway;
@@ -17,77 +16,62 @@ import uo.ri.cws.application.persistence.workorder.WorkOrderGateway;
 import uo.ri.cws.application.persistence.workorder.WorkOrderGateway.WorkOrderRecord;
 import uo.ri.cws.application.service.invoice.InvoicingService.InvoiceDto;
 import uo.ri.util.assertion.ArgumentChecks;
+import uo.ri.util.assertion.BusinessChecks;
 import uo.ri.util.exception.BusinessException;
 
 public class CreateInvoice implements Command<InvoiceDto> {
-	private InvoiceGateway ig = Factories.persistence.forInvoice();
-	private WorkOrderGateway wg = Factories.persistence.forWorkOrder();
-	private List<String> workOrderIds;
+
+	private static final BigDecimal VAT_PERCENTAGE = new BigDecimal("21.0");
+	private static final String APPROVED = "APPROVED";
+	private static final String INVOICED = "INVOICED";
+	private static final String ISSUED = "ISSUED";
+
+	private final InvoiceGateway invoices = Factories.persistence.forInvoice();
+	private final WorkOrderGateway workOrders = Factories.persistence.forWorkOrder();
+	private final List<String> workOrderIds;
 
 	public CreateInvoice(List<String> workOrderIds) {
-		ArgumentChecks.isNotNull(workOrderIds, "WorkOrderIds list cannot be null");
-		ArgumentChecks.isFalse(workOrderIds.isEmpty(), "WorkOrderIds list cannot be empty");
-		for (String id : workOrderIds) {
-			ArgumentChecks.isNotNull(id, "WorkOrder id cannot be null");
-			ArgumentChecks.isNotBlank(id, "WorkOrder id cannot be blank");
-		}
-		this.workOrderIds = workOrderIds;
+		ArgumentChecks.isNotNull(workOrderIds, "The work order ids cannot be null");
+		ArgumentChecks.isFalse(workOrderIds.isEmpty(), "The work order ids cannot be empty");
+		workOrderIds.forEach(id -> ArgumentChecks.isNotBlank(id, "A work order id cannot be null or blank"));
+		this.workOrderIds = workOrderIds.stream().distinct().toList();
 	}
 
 	@Override
 	public InvoiceDto execute() throws BusinessException {
-		List<WorkOrderRecord> workOrders = new ArrayList<>();
+		List<WorkOrderRecord> toInvoice = loadApprovedWorkOrders();
 
+		InvoiceRecord invoice = new InvoiceRecord();
+		invoice.number = invoices.getNextInvoiceNumber();
+		invoice.date = LocalDate.now();
+		invoice.state = ISSUED;
+		invoice.vatRate = VAT_PERCENTAGE;
+		invoice.subtotal = toInvoice.stream().map(wo -> wo.amount).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2,
+				RoundingMode.HALF_EVEN);
+		invoice.vatAmount = invoice.subtotal.multiply(VAT_PERCENTAGE).divide(BigDecimal.valueOf(100), 2,
+				RoundingMode.HALF_EVEN);
+		invoice.total = invoice.subtotal.add(invoice.vatAmount);
+		invoices.add(invoice);
+
+		for (WorkOrderRecord workOrder : toInvoice) {
+			workOrder.state = INVOICED;
+			workOrder.invoiceId = invoice.id;
+			workOrder.updatedAt = LocalDateTime.now();
+			workOrders.update(workOrder);
+		}
+		return InvoicingDtoAssembler.toDto(invoice);
+	}
+
+	private List<WorkOrderRecord> loadApprovedWorkOrders() throws BusinessException {
+		List<WorkOrderRecord> found = new ArrayList<>();
 		for (String id : workOrderIds) {
-			Optional<WorkOrderRecord> owo = wg.findById(id);
-			if (owo.isEmpty()) {
-				throw new BusinessException("Workorder does not exist");
-			}
-			WorkOrderRecord wo = owo.get();
-			if (!"FINISHED".equalsIgnoreCase(wo.state) && !"APPROVED".equalsIgnoreCase(wo.state)) {
-				throw new BusinessException("Workorder is not finished");
-			}
-			workOrders.add(wo);
+			Optional<WorkOrderRecord> workOrder = workOrders.findById(id);
+			BusinessChecks.exists(workOrder, "The work order " + id + " does not exist");
+			BusinessChecks.isTrue(APPROVED.equals(workOrder.get().state),
+					"The work order " + id + " is not " + APPROVED);
+			found.add(workOrder.get());
 		}
-
-		BigDecimal subtotal = BigDecimal.ZERO;
-		for (WorkOrderRecord wo : workOrders) {
-			if (wo.amount != null) {
-				subtotal = subtotal.add(wo.amount);
-			}
-		}
-
-		long number = ig.getNextInvoiceNumber();
-		LocalDate date = LocalDate.now();
-		BigDecimal vatPercentage = getVatPercentage(date);
-		BigDecimal vatAmount = subtotal.multiply(vatPercentage).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
-		BigDecimal total = subtotal.add(vatAmount).setScale(2, RoundingMode.HALF_UP);
-
-		InvoiceDto invoice = new InvoiceDto();
-		invoice.id = UUID.randomUUID().toString();
-		invoice.number = number;
-		invoice.date = date;
-		invoice.subtotal = subtotal;
-		invoice.vatPercentage = vatPercentage;
-		invoice.vatAmount = vatAmount;
-		invoice.total = total;
-		invoice.state = "ISSUED";
-		invoice.version = 1L;
-
-		InvoiceRecord invoiceRecord = InvoicingDtoAssembler.toRecord(invoice);
-		ig.add(invoiceRecord);
-
-		for (WorkOrderRecord wo : workOrders) {
-			wo.invoice_id = invoiceRecord.id;
-			wo.state = "INVOICED";
-			wo.updatedAt = LocalDateTime.now();
-			wg.update(wo);
-		}
-
-		return invoice;
+		return found;
 	}
 
-	private BigDecimal getVatPercentage(LocalDate date) {
-		return date.isBefore(LocalDate.parse("2012-07-01")) ? new BigDecimal("18.0") : new BigDecimal("21.0");
-	}
 }

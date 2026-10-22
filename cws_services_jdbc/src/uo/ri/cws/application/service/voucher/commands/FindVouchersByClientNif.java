@@ -1,8 +1,6 @@
 package uo.ri.cws.application.service.voucher.commands;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import uo.ri.conf.Factories;
 import uo.ri.cws.application.persistence.paymentmean.PaymentMeanGateway;
@@ -10,35 +8,32 @@ import uo.ri.cws.application.persistence.paymentmean.PaymentMeanGateway.VoucherR
 import uo.ri.cws.application.persistence.util.command.Command;
 import uo.ri.cws.application.service.paymentmean.VoucherGenerationService.VoucherDto;
 import uo.ri.util.assertion.ArgumentChecks;
-import uo.ri.util.exception.BusinessException;
 
 public class FindVouchersByClientNif implements Command<List<VoucherDto>> {
 
-    private String nif;
-    private PaymentMeanGateway pmg = Factories.persistence.forPaymentMean();
+	private final PaymentMeanGateway paymentMeans = Factories.persistence.forPaymentMean();
+	private final String nif;
 
-    public FindVouchersByClientNif(String nif) {
-        ArgumentChecks.isNotBlank(nif);
-        this.nif = nif;
-    }
+	public FindVouchersByClientNif(String nif) {
+		ArgumentChecks.isNotBlank(nif, "The nif cannot be null or blank");
+		this.nif = nif;
+	}
 
-    @Override
-    public List<VoucherDto> execute() throws BusinessException {
-        return pmg.findVouchersByClientNif(nif).stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
+	@Override
+	public List<VoucherDto> execute() {
+		return paymentMeans.findVouchersByClientNif(nif).stream().map(FindVouchersByClientNif::toDto).toList();
+	}
 
-    private VoucherDto toDto(VoucherRecord r) {
-        VoucherDto dto = new VoucherDto();
-        dto.id = r.id;
-        dto.version = r.version;
-        dto.clientId = r.client_id;
-        dto.accumulatedAmount = BigDecimal.valueOf(r.accumulated);
-        dto.code = r.code;
-        dto.description = r.description;
-        dto.availableAmount = BigDecimal.valueOf(r.available);
-//        dto.available = r.available;
-        return dto;
-    }
+	private static VoucherDto toDto(VoucherRecord record) {
+		VoucherDto dto = new VoucherDto();
+		dto.id = record.id;
+		dto.version = record.version;
+		dto.clientId = record.clientId;
+		dto.accumulatedAmount = record.accumulated;
+		dto.code = record.code;
+		dto.description = record.description;
+		dto.availableAmount = record.available;
+		return dto;
+	}
+
 }

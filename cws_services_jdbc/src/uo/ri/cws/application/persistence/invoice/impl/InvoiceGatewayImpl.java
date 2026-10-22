@@ -1,12 +1,10 @@
 package uo.ri.cws.application.persistence.invoice.impl;
 
-import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,110 +15,110 @@ import uo.ri.util.exception.PersistenceException;
 
 public class InvoiceGatewayImpl implements InvoiceGateway {
 
-	@Override
-	public void add(InvoiceRecord t) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TINVOICES_INSERT"))) {
-			pst.setString(1, t.id);
-			pst.setLong(2, t.number);
-			pst.setDate(3, Date.valueOf(t.date));
-			pst.setBigDecimal(4, t.vatRate);
-			pst.setBigDecimal(5, t.vatAmount);
-			pst.setBigDecimal(6, t.subtotal);
-			pst.setBigDecimal(7, t.total);
-			pst.setString(8, t.state);
-			pst.setLong(9, t.version);
-			pst.setTimestamp(10, Timestamp.valueOf(t.createdAt));
-			pst.setTimestamp(11, Timestamp.valueOf(t.updatedAt));
-			pst.setString(12, t.entityState);
+	private final InvoiceRecordAssembler assembler = new InvoiceRecordAssembler();
 
+	@Override
+	public void add(InvoiceRecord invoice) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TINVOICES_ADD"))) {
+			pst.setString(1, invoice.id);
+			pst.setLong(2, invoice.number);
+			pst.setDate(3, Date.valueOf(invoice.date));
+			pst.setBigDecimal(4, invoice.vatRate);
+			pst.setBigDecimal(5, invoice.vatAmount);
+			pst.setBigDecimal(6, invoice.subtotal);
+			pst.setBigDecimal(7, invoice.total);
+			pst.setString(8, invoice.state);
+			pst.setLong(9, invoice.version);
+			pst.setTimestamp(10, Timestamp.valueOf(invoice.createdAt));
+			pst.setTimestamp(11, Timestamp.valueOf(invoice.updatedAt));
+			pst.setString(12, invoice.entityState);
 			pst.executeUpdate();
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public void remove(String id) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TINVOICES_REMOVE"))) {
+	public void remove(String id) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TINVOICES_REMOVE"))) {
 			pst.setString(1, id);
 			pst.executeUpdate();
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public void update(InvoiceRecord t) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TINVOICES_UPDATE"))) {
-			pst.setBigDecimal(1, t.total);
-			pst.setBigDecimal(2, t.vatRate);
-			pst.setBigDecimal(3, t.vatAmount);
-			pst.setBigDecimal(4, t.subtotal);
-			pst.setDate(5, Date.valueOf(t.date));
-			pst.setString(6, t.state);
-			pst.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now()));
-			pst.setString(8, t.id);
-
+	public void update(InvoiceRecord invoice) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TINVOICES_UPDATE"))) {
+			pst.setDate(1, Date.valueOf(invoice.date));
+			pst.setBigDecimal(2, invoice.vatRate);
+			pst.setBigDecimal(3, invoice.vatAmount);
+			pst.setBigDecimal(4, invoice.subtotal);
+			pst.setBigDecimal(5, invoice.total);
+			pst.setString(6, invoice.state);
+			pst.setTimestamp(7, Timestamp.valueOf(invoice.updatedAt));
+			pst.setString(8, invoice.id);
 			pst.executeUpdate();
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public Optional<InvoiceRecord> findById(String id) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TINVOICES_FINDBYID"))) {
+	public Optional<InvoiceRecord> findById(String id) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TINVOICES_FINDBYID"))) {
 			pst.setString(1, id);
 			try (ResultSet rs = pst.executeQuery()) {
-				if (rs.next()) {
-					InvoiceRecordAssembler assembler = new InvoiceRecordAssembler(InvoiceRecord::new);
-					return Optional.of(assembler.toRecord(rs));
-				}
-				return Optional.empty();
+				return assembler.toOptionalRecord(rs);
 			}
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public List<InvoiceRecord> findAll() throws PersistenceException {
-		return List.of();
+	public List<InvoiceRecord> findAll() {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TINVOICES_FINDALL")); ResultSet rs = pst.executeQuery()) {
+			return assembler.toRecordList(rs);
+
+		} catch (SQLException e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
-	public Optional<InvoiceRecord> findByNumber(Long number) throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TINVOICES_FINDBYNUMBER"))) {
-			pst.setLong(1, number);
+	public long getNextInvoiceNumber() {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TINVOICES_LASTNUMBER")); ResultSet rs = pst.executeQuery()) {
+			rs.next();
+			return rs.getLong(1) + 1; // MAX() of an empty table is NULL, read as 0
+		} catch (SQLException e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
+	public boolean hasPaidInvoices(String clientId) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TINVOICES_EXISTSPAIDBYCLIENTID"))) {
+			pst.setString(1, clientId);
 			try (ResultSet rs = pst.executeQuery()) {
-				if (rs.next()) {
-					InvoiceRecordAssembler assembler = new InvoiceRecordAssembler(InvoiceRecord::new);
-					return Optional.of(assembler.toRecord(rs));
-				}
-				return Optional.empty();
+				return rs.next();
 			}
+
 		} catch (SQLException e) {
 			throw new PersistenceException(e);
 		}
 	}
 
-	@Override
-	public Long getNextInvoiceNumber() throws PersistenceException {
-		Connection c = Jdbc.getCurrentConnection();
-		try (PreparedStatement pst = c.prepareStatement(Queries.getSQLSentence("TINVOICES_SELECT_LAST_NUMBER"))) {
-			try (ResultSet rs = pst.executeQuery()) {
-				if (rs.next()) {
-					return rs.getLong(1) + 1;
-				}
-				return 1L;
-			}
-		} catch (SQLException e) {
-			throw new PersistenceException(e);
-		}
-	}
 }

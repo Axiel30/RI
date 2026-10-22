@@ -3,6 +3,7 @@ package uo.ri.cws.application.persistence;
 import uo.ri.cws.application.persistence.client.ClientGateway;
 import uo.ri.cws.application.persistence.client.impl.ClientGatewayImpl;
 import uo.ri.cws.application.persistence.intervention.InterventionGateway;
+import uo.ri.cws.application.persistence.intervention.impl.InterventionGatewayImpl;
 import uo.ri.cws.application.persistence.invoice.InvoiceGateway;
 import uo.ri.cws.application.persistence.invoice.impl.InvoiceGatewayImpl;
 import uo.ri.cws.application.persistence.mechanic.MechanicGateway;
@@ -33,22 +34,21 @@ public class PersistenceFactoryImpl implements PersistenceFactory {
 
 	@Override
 	public InterventionGateway forIntervention() {
-		// TODO Auto-generated method stub
-		return null;
+		return new InterventionGatewayImpl();
 	}
-	
+
 	@Override
 	public ClientGateway forClient() {
-	    return new ClientGatewayImpl();
+		return new ClientGatewayImpl();
 	}
 
 	@Override
 	public RecommendationGateway forRecommendation() {
-	    return new RecommendationGatewayImpl();
+		return new RecommendationGatewayImpl();
 	}
 
 	@Override
 	public PaymentMeanGateway forPaymentMean() {
-	    return new PaymentMeanGatewayImpl();
+		return new PaymentMeanGatewayImpl();
 	}
 }

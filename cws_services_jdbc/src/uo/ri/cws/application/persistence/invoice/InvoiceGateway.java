@@ -2,26 +2,28 @@ package uo.ri.cws.application.persistence.invoice;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Optional;
 
 import uo.ri.cws.application.persistence.Gateway;
-import uo.ri.cws.application.persistence.invoice.InvoiceGateway.InvoiceRecord;
-import uo.ri.util.exception.PersistenceException;
 
-public interface InvoiceGateway extends Gateway<InvoiceRecord> {
+public interface InvoiceGateway extends Gateway<InvoiceGateway.InvoiceRecord> {
 
-	Optional<InvoiceRecord> findByNumber(Long number) throws PersistenceException;
+	/** @return the number following the highest invoice number, 1 if none */
+	long getNextInvoiceNumber();
 
-	Long getNextInvoiceNumber() throws PersistenceException;
+	/**
+	 * @return true if some work order of the client was invoiced in an invoice
+	 *         already paid
+	 */
+	boolean hasPaidInvoices(String clientId);
 
-	public static class InvoiceRecord extends BaseRecord {
-	    public BigDecimal subtotal;
-	    public BigDecimal vatRate;
-	    public BigDecimal vatAmount;
-	    public BigDecimal total;
-	    
-	    public long number;
-	    public LocalDate date;
-	    public String state;
+	class InvoiceRecord extends Gateway.BaseRecord {
+		public long number;
+		public LocalDate date;
+		public BigDecimal vatRate;
+		public BigDecimal vatAmount;
+		public BigDecimal subtotal;
+		public BigDecimal total;
+		public String state;
 	}
+
 }

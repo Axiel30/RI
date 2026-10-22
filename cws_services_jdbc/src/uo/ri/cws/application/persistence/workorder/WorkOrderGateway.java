@@ -5,24 +5,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import uo.ri.cws.application.persistence.Gateway;
-import uo.ri.cws.application.persistence.workorder.WorkOrderGateway.WorkOrderRecord;
-import uo.ri.util.exception.PersistenceException;
 
-public interface WorkOrderGateway extends Gateway<WorkOrderRecord> {
+public interface WorkOrderGateway extends Gateway<WorkOrderGateway.WorkOrderRecord> {
 
-	List<WorkOrderRecord> findNotInvoicedByClientNif(String nif) throws PersistenceException;
+	/** @return the APPROVED work orders of the vehicles of the client */
+	List<WorkOrderRecord> findNotInvoicedByClientNif(String nif);
 
-	List<WorkOrderRecord> findByIds(List<String> workOrderIds) throws PersistenceException;
+	boolean existsByMechanicId(String mechanicId);
 
-	List<WorkOrderRecord> findByClientId(String clientId);
-
-	public static class WorkOrderRecord extends BaseRecord {
-		public BigDecimal amount;
-		public LocalDateTime date;
+	class WorkOrderRecord extends Gateway.BaseRecord {
 		public String description;
+		public LocalDateTime date;
+		public BigDecimal amount;
 		public String state;
-		public String invoice_id;
-		public String mechanic_id;
-		public String vehicle_id;
+		public String invoiceId;
+		public String mechanicId;
+		public String vehicleId;
 	}
+
 }

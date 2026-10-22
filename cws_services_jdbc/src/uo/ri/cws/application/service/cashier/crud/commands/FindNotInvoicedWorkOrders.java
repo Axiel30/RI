@@ -7,20 +7,20 @@ import uo.ri.cws.application.persistence.util.command.Command;
 import uo.ri.cws.application.persistence.workorder.WorkOrderGateway;
 import uo.ri.cws.application.service.invoice.InvoicingService.InvoicingWorkOrderDto;
 import uo.ri.util.assertion.ArgumentChecks;
-import uo.ri.util.exception.BusinessException;
 
 public class FindNotInvoicedWorkOrders implements Command<List<InvoicingWorkOrderDto>> {
-	private WorkOrderGateway wg = Factories.persistence.forWorkOrder();
-	private String nif;
+
+	private final WorkOrderGateway workOrders = Factories.persistence.forWorkOrder();
+	private final String nif;
 
 	public FindNotInvoicedWorkOrders(String nif) {
-		ArgumentChecks.isNotNull(nif, "NIF cannot be null");
-		ArgumentChecks.isNotBlank(nif, "NIF cannot be blank");
+		ArgumentChecks.isNotBlank(nif, "The nif cannot be null or blank");
 		this.nif = nif;
 	}
 
 	@Override
-	public List<InvoicingWorkOrderDto> execute() throws BusinessException {
-		return InvoicingDtoAssembler.toWorkOrderDtoList(wg.findNotInvoicedByClientNif(nif));
+	public List<InvoicingWorkOrderDto> execute() {
+		return InvoicingDtoAssembler.toWorkOrderDtoList(workOrders.findNotInvoicedByClientNif(nif));
 	}
+
 }
