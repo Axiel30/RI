@@ -96,6 +96,20 @@ public class ClientGatewayImpl implements ClientGateway {
 		}
 	}
 
+	@Override
+	public List<ClientRecord> findRecommendedByNif(String recommenderNif) {
+		try (PreparedStatement pst = Jdbc.getCurrentConnection()
+				.prepareStatement(Queries.getSQLSentence("TCLIENTS_FINDRECOMMENDEDBYNIF"))) {
+			pst.setString(1, recommenderNif);
+			try (ResultSet rs = pst.executeQuery()) {
+				return assembler.toRecordList(rs);
+			}
+
+		} catch (SQLException e) {
+			throw new PersistenceException(e);
+		}
+	}
+
 	private Optional<ClientRecord> findOne(String query, String arg) {
 		try (PreparedStatement pst = Jdbc.getCurrentConnection().prepareStatement(Queries.getSQLSentence(query))) {
 			pst.setString(1, arg);

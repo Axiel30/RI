@@ -1,4 +1,4 @@
-package uo.ri.cws.application.service.voucher.commands;
+package uo.ri.cws.application.service.voucher.crud.command;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

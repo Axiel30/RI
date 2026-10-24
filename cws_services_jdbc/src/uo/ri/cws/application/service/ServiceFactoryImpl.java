@@ -3,6 +3,7 @@ package uo.ri.cws.application.service;
 import uo.ri.cws.application.service.cashier.crud.CashierCrudServiceImpl;
 import uo.ri.cws.application.service.client.ClientCrudService;
 import uo.ri.cws.application.service.client.ClientHistoryService;
+import uo.ri.cws.application.service.client.crud.ClientCrudServiceImpl;
 import uo.ri.cws.application.service.invoice.InvoicingService;
 import uo.ri.cws.application.service.mechanic.MechanicCrudService;
 import uo.ri.cws.application.service.mechanic.crud.MechanicCrudServiceImpl;
@@ -12,7 +13,7 @@ import uo.ri.cws.application.service.paymentmean.crud.PaymentMeanCrudServiceImpl
 import uo.ri.cws.application.service.spare.SparePartCrudService;
 import uo.ri.cws.application.service.vehicle.VehicleCrudService;
 import uo.ri.cws.application.service.vehicletype.VehicleTypeCrudService;
-import uo.ri.cws.application.service.voucher.VoucherGenerationServiceImpl;
+import uo.ri.cws.application.service.voucher.crud.VoucherGenerationServiceImpl;
 import uo.ri.cws.application.service.workorder.CloseWorkOrderService;
 import uo.ri.cws.application.service.workorder.ViewAssignedWorkOrdersService;
 import uo.ri.cws.application.service.workorder.WorkOrderCrudService;
@@ -47,7 +48,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
 
 	@Override
 	public ClientCrudService forClientCrudService() {
-		throw new NotYetImplementedException();
+		return new ClientCrudServiceImpl();
 	}
 
 	@Override

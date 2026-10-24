@@ -12,6 +12,8 @@ import uo.ri.cws.application.persistence.paymentmean.PaymentMeanGateway;
 import uo.ri.cws.application.persistence.paymentmean.impl.PaymentMeanGatewayImpl;
 import uo.ri.cws.application.persistence.recommendation.RecommendationGateway;
 import uo.ri.cws.application.persistence.recommendation.impl.RecommendationGatewayImpl;
+import uo.ri.cws.application.persistence.vehicle.VehicleGateway;
+import uo.ri.cws.application.persistence.vehicle.impl.VehicleGatewayImpl;
 import uo.ri.cws.application.persistence.workorder.WorkOrderGateway;
 import uo.ri.cws.application.persistence.workorder.impl.WorkOrderGatewayImpl;
 
@@ -50,5 +52,10 @@ public class PersistenceFactoryImpl implements PersistenceFactory {
 	@Override
 	public PaymentMeanGateway forPaymentMean() {
 		return new PaymentMeanGatewayImpl();
+	}
+
+	@Override
+	public VehicleGateway forVehicle() {
+		return new VehicleGatewayImpl();
 	}
 }

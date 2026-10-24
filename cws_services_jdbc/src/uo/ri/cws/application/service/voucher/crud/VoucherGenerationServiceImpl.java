@@ -1,12 +1,12 @@
-package uo.ri.cws.application.service.voucher;
+package uo.ri.cws.application.service.voucher.crud;
 
 import java.util.List;
 
 import uo.ri.cws.application.persistence.util.command.CommandExecutor;
 import uo.ri.cws.application.service.paymentmean.VoucherGenerationService;
-import uo.ri.cws.application.service.voucher.commands.FindVouchersByClientNif;
-import uo.ri.cws.application.service.voucher.commands.GenerateVouchersByRecommendations;
-import uo.ri.cws.application.service.voucher.commands.GetVoucherSummary;
+import uo.ri.cws.application.service.voucher.crud.command.FindVouchersByClientNif;
+import uo.ri.cws.application.service.voucher.crud.command.GenerateVouchersByRecommendations;
+import uo.ri.cws.application.service.voucher.crud.command.GetVoucherSummary;
 import uo.ri.util.exception.BusinessException;
 
 public class VoucherGenerationServiceImpl implements VoucherGenerationService {

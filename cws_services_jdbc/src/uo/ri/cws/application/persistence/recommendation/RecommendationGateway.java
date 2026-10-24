@@ -6,6 +6,11 @@ import uo.ri.cws.application.persistence.Gateway;
 
 public interface RecommendationGateway extends Gateway<RecommendationGateway.RecommendationRecord> {
 
+	/*
+	 * @return the recommendations made or received by the client
+	 */
+	List<RecommendationRecord> findByClientId(String clientId);
+
 	/**
 	 * @return the recommendations made by the sponsor not yet used to get a voucher
 	 */

@@ -1,5 +1,6 @@
 package uo.ri.cws.application.persistence.client;
 
+import java.util.List;
 import java.util.Optional;
 
 import uo.ri.cws.application.persistence.Gateway;
@@ -7,6 +8,8 @@ import uo.ri.cws.application.persistence.Gateway;
 public interface ClientGateway extends Gateway<ClientGateway.ClientRecord> {
 
 	Optional<ClientRecord> findByNif(String nif);
+
+	List<ClientRecord> findRecommendedByNif(String recommenderNif);
 
 	class ClientRecord extends Gateway.BaseRecord {
 		public String nif;
