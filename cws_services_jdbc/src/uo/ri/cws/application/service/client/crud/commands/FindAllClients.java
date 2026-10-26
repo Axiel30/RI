@@ -9,11 +9,11 @@ import uo.ri.cws.application.service.client.ClientCrudService.ClientDto;
 
 public class FindAllClients implements Command<List<ClientDto>> {
 
-	private final ClientGateway clients = Factories.persistence.forClient();
+    private final ClientGateway clients = Factories.persistence.forClient();
 
-	@Override
-	public List<ClientDto> execute() {
-		return ClientDtoAssembler.toDtoList(clients.findAll());
-	}
+    @Override
+    public List<ClientDto> execute() {
+        return ClientDtoAssembler.toDtoList(clients.findAll());
+    }
 
 }

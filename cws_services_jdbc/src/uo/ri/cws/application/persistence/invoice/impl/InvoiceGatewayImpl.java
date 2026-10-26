@@ -15,110 +15,117 @@ import uo.ri.util.exception.PersistenceException;
 
 public class InvoiceGatewayImpl implements InvoiceGateway {
 
-	private final InvoiceRecordAssembler assembler = new InvoiceRecordAssembler();
+    private final InvoiceRecordAssembler assembler = new InvoiceRecordAssembler();
 
-	@Override
-	public void add(InvoiceRecord invoice) {
-		try (PreparedStatement pst = Jdbc.getCurrentConnection()
-				.prepareStatement(Queries.getSQLSentence("TINVOICES_ADD"))) {
-			pst.setString(1, invoice.id);
-			pst.setLong(2, invoice.number);
-			pst.setDate(3, Date.valueOf(invoice.date));
-			pst.setBigDecimal(4, invoice.vatRate);
-			pst.setBigDecimal(5, invoice.vatAmount);
-			pst.setBigDecimal(6, invoice.subtotal);
-			pst.setBigDecimal(7, invoice.total);
-			pst.setString(8, invoice.state);
-			pst.setLong(9, invoice.version);
-			pst.setTimestamp(10, Timestamp.valueOf(invoice.createdAt));
-			pst.setTimestamp(11, Timestamp.valueOf(invoice.updatedAt));
-			pst.setString(12, invoice.entityState);
-			pst.executeUpdate();
+    @Override
+    public void add(InvoiceRecord invoice) {
+        try (PreparedStatement pst = Jdbc.getCurrentConnection()
+            .prepareStatement(Queries.getSQLSentence("TINVOICES_ADD"))) {
+            pst.setString(1, invoice.id);
+            pst.setLong(2, invoice.number);
+            pst.setDate(3, Date.valueOf(invoice.date));
+            pst.setBigDecimal(4, invoice.vatRate);
+            pst.setBigDecimal(5, invoice.vatAmount);
+            pst.setBigDecimal(6, invoice.subtotal);
+            pst.setBigDecimal(7, invoice.total);
+            pst.setString(8, invoice.state);
+            pst.setLong(9, invoice.version);
+            pst.setTimestamp(10, Timestamp.valueOf(invoice.createdAt));
+            pst.setTimestamp(11, Timestamp.valueOf(invoice.updatedAt));
+            pst.setString(12, invoice.entityState);
+            pst.setBoolean(13, invoice.usedForVoucher);
+            pst.executeUpdate();
 
-		} catch (SQLException e) {
-			throw new PersistenceException(e);
-		}
-	}
+        } catch (SQLException e) {
+            throw new PersistenceException(e);
+        }
+    }
 
-	@Override
-	public void remove(String id) {
-		try (PreparedStatement pst = Jdbc.getCurrentConnection()
-				.prepareStatement(Queries.getSQLSentence("TINVOICES_REMOVE"))) {
-			pst.setString(1, id);
-			pst.executeUpdate();
+    @Override
+    public void remove(String id) {
+        try (PreparedStatement pst = Jdbc.getCurrentConnection()
+            .prepareStatement(Queries.getSQLSentence("TINVOICES_REMOVE"))) {
+            pst.setString(1, id);
+            pst.executeUpdate();
 
-		} catch (SQLException e) {
-			throw new PersistenceException(e);
-		}
-	}
+        } catch (SQLException e) {
+            throw new PersistenceException(e);
+        }
+    }
 
-	@Override
-	public void update(InvoiceRecord invoice) {
-		try (PreparedStatement pst = Jdbc.getCurrentConnection()
-				.prepareStatement(Queries.getSQLSentence("TINVOICES_UPDATE"))) {
-			pst.setDate(1, Date.valueOf(invoice.date));
-			pst.setBigDecimal(2, invoice.vatRate);
-			pst.setBigDecimal(3, invoice.vatAmount);
-			pst.setBigDecimal(4, invoice.subtotal);
-			pst.setBigDecimal(5, invoice.total);
-			pst.setString(6, invoice.state);
-			pst.setTimestamp(7, Timestamp.valueOf(invoice.updatedAt));
-			pst.setString(8, invoice.id);
-			pst.executeUpdate();
+    @Override
+    public void update(InvoiceRecord invoice) {
+        try (PreparedStatement pst = Jdbc.getCurrentConnection()
+            .prepareStatement(Queries.getSQLSentence("TINVOICES_UPDATE"))) {
+            pst.setDate(1, Date.valueOf(invoice.date));
+            pst.setBigDecimal(2, invoice.vatRate);
+            pst.setBigDecimal(3, invoice.vatAmount);
+            pst.setBigDecimal(4, invoice.subtotal);
+            pst.setBigDecimal(5, invoice.total);
+            pst.setString(6, invoice.state);
+            pst.setBoolean(7, invoice.usedForVoucher);
+            pst.setTimestamp(8, Timestamp.valueOf(invoice.updatedAt));
+            pst.setString(9, invoice.id);
+            pst.executeUpdate();
 
-		} catch (SQLException e) {
-			throw new PersistenceException(e);
-		}
-	}
+        } catch (SQLException e) {
+            throw new PersistenceException(e);
+        }
+    }
 
-	@Override
-	public Optional<InvoiceRecord> findById(String id) {
-		try (PreparedStatement pst = Jdbc.getCurrentConnection()
-				.prepareStatement(Queries.getSQLSentence("TINVOICES_FINDBYID"))) {
-			pst.setString(1, id);
-			try (ResultSet rs = pst.executeQuery()) {
-				return assembler.toOptionalRecord(rs);
-			}
+    @Override
+    public Optional<InvoiceRecord> findById(String id) {
+        try (PreparedStatement pst = Jdbc.getCurrentConnection()
+            .prepareStatement(Queries.getSQLSentence("TINVOICES_FINDBYID"))) {
+            pst.setString(1, id);
+            try (ResultSet rs = pst.executeQuery()) {
+                return assembler.toOptionalRecord(rs);
+            }
 
-		} catch (SQLException e) {
-			throw new PersistenceException(e);
-		}
-	}
+        } catch (SQLException e) {
+            throw new PersistenceException(e);
+        }
+    }
 
-	@Override
-	public List<InvoiceRecord> findAll() {
-		try (PreparedStatement pst = Jdbc.getCurrentConnection()
-				.prepareStatement(Queries.getSQLSentence("TINVOICES_FINDALL")); ResultSet rs = pst.executeQuery()) {
-			return assembler.toRecordList(rs);
+    @Override
+    public List<InvoiceRecord> findAll() {
+        try (
+            PreparedStatement pst = Jdbc.getCurrentConnection()
+                .prepareStatement(Queries.getSQLSentence("TINVOICES_FINDALL"));
+            ResultSet rs = pst.executeQuery()) {
+            return assembler.toRecordList(rs);
 
-		} catch (SQLException e) {
-			throw new PersistenceException(e);
-		}
-	}
+        } catch (SQLException e) {
+            throw new PersistenceException(e);
+        }
+    }
 
-	@Override
-	public long getNextInvoiceNumber() {
-		try (PreparedStatement pst = Jdbc.getCurrentConnection()
-				.prepareStatement(Queries.getSQLSentence("TINVOICES_LASTNUMBER")); ResultSet rs = pst.executeQuery()) {
-			rs.next();
-			return rs.getLong(1) + 1; // MAX() of an empty table is NULL, read as 0
-		} catch (SQLException e) {
-			throw new PersistenceException(e);
-		}
-	}
+    @Override
+    public long findLastNumber() {
+        try (
+            PreparedStatement pst = Jdbc.getCurrentConnection()
+                .prepareStatement(Queries.getSQLSentence("TINVOICES_LASTNUMBER"));
+            ResultSet rs = pst.executeQuery()) {
+            rs.next();
+            return rs.getLong(1); // MAX() of an empty table is NULL, read as 0
+        } catch (SQLException e) {
+            throw new PersistenceException(e);
+        }
+    }
 
-	@Override
-	public boolean hasPaidInvoices(String clientId) {
-		try (PreparedStatement pst = Jdbc.getCurrentConnection()
-				.prepareStatement(Queries.getSQLSentence("TINVOICES_EXISTSPAIDBYCLIENTID"))) {
-			pst.setString(1, clientId);
-			try (ResultSet rs = pst.executeQuery()) {
-				return rs.next();
-			}
+    @Override
+    public boolean existsByClientIdAndState(String clientId, String state) {
+        try (PreparedStatement pst = Jdbc.getCurrentConnection()
+            .prepareStatement(Queries.getSQLSentence("TINVOICES_EXISTSBYCLIENTIDANDSTATE"))) {
+            pst.setString(1, clientId);
+            pst.setString(2, state);
+            try (ResultSet rs = pst.executeQuery()) {
+                return rs.next();
+            }
 
-		} catch (SQLException e) {
-			throw new PersistenceException(e);
-		}
-	}
+        } catch (SQLException e) {
+            throw new PersistenceException(e);
+        }
+    }
 
 }

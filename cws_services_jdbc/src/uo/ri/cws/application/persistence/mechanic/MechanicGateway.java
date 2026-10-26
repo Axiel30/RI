@@ -6,12 +6,12 @@ import uo.ri.cws.application.persistence.Gateway;
 
 public interface MechanicGateway extends Gateway<MechanicGateway.MechanicRecord> {
 
-	Optional<MechanicRecord> findByNif(String nif);
+    Optional<MechanicRecord> findByNif(String nif);
 
-	class MechanicRecord extends Gateway.BaseRecord {
-		public String nif;
-		public String name;
-		public String surname;
-	}
+    class MechanicRecord extends Gateway.BaseRecord {
+        public String nif;
+        public String name;
+        public String surname;
+    }
 
 }

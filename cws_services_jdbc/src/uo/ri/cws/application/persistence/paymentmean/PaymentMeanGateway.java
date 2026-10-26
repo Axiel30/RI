@@ -9,56 +9,48 @@ import uo.ri.cws.application.persistence.Gateway;
 
 public interface PaymentMeanGateway extends Gateway<PaymentMeanGateway.PaymentMeanRecord> {
 
-	List<PaymentMeanRecord> findByClientId(String clientId);
+    List<PaymentMeanRecord> findByClientId(String clientId);
 
-	Optional<VoucherRecord> findVoucherByCode(String code);
+    Optional<VoucherRecord> findVoucherByCode(String code);
 
-	Optional<CreditCardRecord> findCreditCardByNumber(String number);
+    Optional<CreditCardRecord> findCreditCardByNumber(String number);
 
-	List<VoucherRecord> findVouchersByClientNif(String nif);
+    List<VoucherRecord> findVouchersByClientNif(String nif);
 
-	boolean hasCharges(String paymentMeanId);
+    boolean hasCharges(String paymentMeanId);
 
-	/**
-	 * @return one row per client with vouchers, the ones with more available amount
-	 *         first
-	 */
-	List<VoucherSummaryRecord> findVoucherSummaries();
+    List<VoucherRecord> findAllVouchers();
 
-	class PaymentMeanRecord extends Gateway.BaseRecord {
-		public String dtype;
-		public String clientId;
-		public BigDecimal accumulated = BigDecimal.ZERO;
-	}
+    class PaymentMeanRecord extends Gateway.BaseRecord {
+        public String dtype;
+        public String clientId;
+        public BigDecimal accumulated = BigDecimal.ZERO;
+    }
 
-	class CashRecord extends PaymentMeanRecord {
-		public CashRecord() {
-			dtype = "Cash";
-		}
-	}
+    class CashRecord extends PaymentMeanRecord {
+        public CashRecord() {
+            dtype = "Cash";
+        }
+    }
 
-	class VoucherRecord extends PaymentMeanRecord {
-		public String code;
-		public String description;
-		public BigDecimal available;
+    class VoucherRecord extends PaymentMeanRecord {
+        public String code;
+        public String description;
+        public BigDecimal available;
 
-		public VoucherRecord() {
-			dtype = "Voucher";
-		}
-	}
+        public VoucherRecord() {
+            dtype = "Voucher";
+        }
+    }
 
-	class CreditCardRecord extends PaymentMeanRecord {
-		public String number;
-		public String type;
-		public LocalDate validThru;
+    class CreditCardRecord extends PaymentMeanRecord {
+        public String number;
+        public String type;
+        public LocalDate validThru;
 
-		public CreditCardRecord() {
-			dtype = "CreditCard";
-		}
-	}
-
-	record VoucherSummaryRecord(String nif, String name, String surname, long issued, BigDecimal total,
-			BigDecimal available, BigDecimal consumed) {
-	}
+        public CreditCardRecord() {
+            dtype = "CreditCard";
+        }
+    }
 
 }

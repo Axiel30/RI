@@ -7,23 +7,24 @@ import uo.ri.cws.application.persistence.Gateway;
 
 public interface InvoiceGateway extends Gateway<InvoiceGateway.InvoiceRecord> {
 
-	/** @return the number following the highest invoice number, 1 if none */
-	long getNextInvoiceNumber();
+    /** @return the highest invoice number, 0 if there are no invoices */
+    long findLastNumber();
 
-	/**
-	 * @return true if some work order of the client was invoiced in an invoice
-	 *         already paid
-	 */
-	boolean hasPaidInvoices(String clientId);
+    /**
+     * @return true if some work order of the client was invoiced in an invoice in
+     *         the given state
+     */
+    boolean existsByClientIdAndState(String clientId, String state);
 
-	class InvoiceRecord extends Gateway.BaseRecord {
-		public long number;
-		public LocalDate date;
-		public BigDecimal vatRate;
-		public BigDecimal vatAmount;
-		public BigDecimal subtotal;
-		public BigDecimal total;
-		public String state;
-	}
+    class InvoiceRecord extends Gateway.BaseRecord {
+        public long number;
+        public LocalDate date;
+        public BigDecimal vatRate;
+        public BigDecimal vatAmount;
+        public BigDecimal subtotal;
+        public BigDecimal total;
+        public String state;
+        public boolean usedForVoucher;
+    }
 
 }

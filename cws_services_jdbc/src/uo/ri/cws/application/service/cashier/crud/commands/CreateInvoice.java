@@ -21,57 +21,57 @@ import uo.ri.util.exception.BusinessException;
 
 public class CreateInvoice implements Command<InvoiceDto> {
 
-	private static final BigDecimal VAT_PERCENTAGE = new BigDecimal("21.0");
-	private static final String APPROVED = "APPROVED";
-	private static final String INVOICED = "INVOICED";
-	private static final String ISSUED = "ISSUED";
+    private static final BigDecimal VAT_PERCENTAGE = new BigDecimal("21.0");
+    private static final String APPROVED = "APPROVED";
+    private static final String INVOICED = "INVOICED";
+    private static final String ISSUED = "ISSUED";
 
-	private final InvoiceGateway invoices = Factories.persistence.forInvoice();
-	private final WorkOrderGateway workOrders = Factories.persistence.forWorkOrder();
-	private final List<String> workOrderIds;
+    private final InvoiceGateway invoices = Factories.persistence.forInvoice();
+    private final WorkOrderGateway workOrders = Factories.persistence.forWorkOrder();
+    private final List<String> workOrderIds;
 
-	public CreateInvoice(List<String> workOrderIds) {
-		ArgumentChecks.isNotNull(workOrderIds, "The work order ids cannot be null");
-		ArgumentChecks.isFalse(workOrderIds.isEmpty(), "The work order ids cannot be empty");
-		workOrderIds.forEach(id -> ArgumentChecks.isNotBlank(id, "A work order id cannot be null or blank"));
-		this.workOrderIds = workOrderIds.stream().distinct().toList();
-	}
+    public CreateInvoice(List<String> workOrderIds) {
+        ArgumentChecks.isNotNull(workOrderIds, "The work order ids cannot be null");
+        ArgumentChecks.isFalse(workOrderIds.isEmpty(), "The work order ids cannot be empty");
+        workOrderIds.forEach(id -> ArgumentChecks.isNotBlank(id, "A work order id cannot be null or blank"));
+        this.workOrderIds = workOrderIds.stream().distinct().toList();
+    }
 
-	@Override
-	public InvoiceDto execute() throws BusinessException {
-		List<WorkOrderRecord> toInvoice = loadApprovedWorkOrders();
+    @Override
+    public InvoiceDto execute() throws BusinessException {
+        List<WorkOrderRecord> toInvoice = loadApprovedWorkOrders();
 
-		InvoiceRecord invoice = new InvoiceRecord();
-		invoice.number = invoices.getNextInvoiceNumber();
-		invoice.date = LocalDate.now();
-		invoice.state = ISSUED;
-		invoice.vatRate = VAT_PERCENTAGE;
-		invoice.subtotal = toInvoice.stream().map(wo -> wo.amount).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2,
-				RoundingMode.HALF_EVEN);
-		invoice.vatAmount = invoice.subtotal.multiply(VAT_PERCENTAGE).divide(BigDecimal.valueOf(100), 2,
-				RoundingMode.HALF_EVEN);
-		invoice.total = invoice.subtotal.add(invoice.vatAmount);
-		invoices.add(invoice);
+        InvoiceRecord invoice = new InvoiceRecord();
+        invoice.number = invoices.findLastNumber() + 1;
+        invoice.date = LocalDate.now();
+        invoice.state = ISSUED;
+        invoice.vatRate = VAT_PERCENTAGE;
+        invoice.subtotal = toInvoice.stream().map(wo -> wo.amount).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2,
+            RoundingMode.HALF_EVEN);
+        invoice.vatAmount = invoice.subtotal.multiply(VAT_PERCENTAGE).divide(BigDecimal.valueOf(100), 2,
+            RoundingMode.HALF_EVEN);
+        invoice.total = invoice.subtotal.add(invoice.vatAmount);
+        invoices.add(invoice);
 
-		for (WorkOrderRecord workOrder : toInvoice) {
-			workOrder.state = INVOICED;
-			workOrder.invoiceId = invoice.id;
-			workOrder.updatedAt = LocalDateTime.now();
-			workOrders.update(workOrder);
-		}
-		return InvoicingDtoAssembler.toDto(invoice);
-	}
+        for (WorkOrderRecord workOrder : toInvoice) {
+            workOrder.state = INVOICED;
+            workOrder.invoiceId = invoice.id;
+            workOrder.updatedAt = LocalDateTime.now();
+            workOrders.update(workOrder);
+        }
+        return InvoicingDtoAssembler.toDto(invoice);
+    }
 
-	private List<WorkOrderRecord> loadApprovedWorkOrders() throws BusinessException {
-		List<WorkOrderRecord> found = new ArrayList<>();
-		for (String id : workOrderIds) {
-			Optional<WorkOrderRecord> workOrder = workOrders.findById(id);
-			BusinessChecks.exists(workOrder, "The work order " + id + " does not exist");
-			BusinessChecks.isTrue(APPROVED.equals(workOrder.get().state),
-					"The work order " + id + " is not " + APPROVED);
-			found.add(workOrder.get());
-		}
-		return found;
-	}
+    private List<WorkOrderRecord> loadApprovedWorkOrders() throws BusinessException {
+        List<WorkOrderRecord> found = new ArrayList<>();
+        for (String id : workOrderIds) {
+            Optional<WorkOrderRecord> workOrder = workOrders.findById(id);
+            BusinessChecks.exists(workOrder, "The work order " + id + " does not exist");
+            BusinessChecks.isTrue(APPROVED.equals(workOrder.get().state),
+                "The work order " + id + " is not " + APPROVED);
+            found.add(workOrder.get());
+        }
+        return found;
+    }
 
 }

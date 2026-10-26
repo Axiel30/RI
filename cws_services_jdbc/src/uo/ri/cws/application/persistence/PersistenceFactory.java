@@ -11,23 +11,23 @@ import uo.ri.cws.application.persistence.workorder.WorkOrderGateway;
 
 public interface PersistenceFactory {
 
-	MechanicGateway forMechanic();
+    MechanicGateway forMechanic();
 
-	WorkOrderGateway forWorkOrder();
+    WorkOrderGateway forWorkOrder();
 
-	InvoiceGateway forInvoice();
+    InvoiceGateway forInvoice();
 
-	InterventionGateway forIntervention();
+    InterventionGateway forIntervention();
 
-	ClientGateway forClient();
+    ClientGateway forClient();
 
-	RecommendationGateway forRecommendation();
+    RecommendationGateway forRecommendation();
 
-	PaymentMeanGateway forPaymentMean();
+    PaymentMeanGateway forPaymentMean();
 
-	VehicleGateway forVehicle();
+    VehicleGateway forVehicle();
 
-	// SparePartGateway forSparePart();
-	// SubstitutionGateway forSubstitutionsGateway();
-	// VehicleTypeGateway forVehicleType();
+    // SparePartGateway forSparePart();
+    // SubstitutionGateway forSubstitutionsGateway();
+    // VehicleTypeGateway forVehicleType();
 }

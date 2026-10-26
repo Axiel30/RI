@@ -19,43 +19,43 @@ import uo.ri.cws.application.persistence.workorder.impl.WorkOrderGatewayImpl;
 
 public class PersistenceFactoryImpl implements PersistenceFactory {
 
-	@Override
-	public MechanicGateway forMechanic() {
-		return new MechanicGatewayImpl();
-	}
+    @Override
+    public MechanicGateway forMechanic() {
+        return new MechanicGatewayImpl();
+    }
 
-	@Override
-	public WorkOrderGateway forWorkOrder() {
-		return new WorkOrderGatewayImpl();
-	}
+    @Override
+    public WorkOrderGateway forWorkOrder() {
+        return new WorkOrderGatewayImpl();
+    }
 
-	@Override
-	public InvoiceGateway forInvoice() {
-		return new InvoiceGatewayImpl();
-	}
+    @Override
+    public InvoiceGateway forInvoice() {
+        return new InvoiceGatewayImpl();
+    }
 
-	@Override
-	public InterventionGateway forIntervention() {
-		return new InterventionGatewayImpl();
-	}
+    @Override
+    public InterventionGateway forIntervention() {
+        return new InterventionGatewayImpl();
+    }
 
-	@Override
-	public ClientGateway forClient() {
-		return new ClientGatewayImpl();
-	}
+    @Override
+    public ClientGateway forClient() {
+        return new ClientGatewayImpl();
+    }
 
-	@Override
-	public RecommendationGateway forRecommendation() {
-		return new RecommendationGatewayImpl();
-	}
+    @Override
+    public RecommendationGateway forRecommendation() {
+        return new RecommendationGatewayImpl();
+    }
 
-	@Override
-	public PaymentMeanGateway forPaymentMean() {
-		return new PaymentMeanGatewayImpl();
-	}
+    @Override
+    public PaymentMeanGateway forPaymentMean() {
+        return new PaymentMeanGatewayImpl();
+    }
 
-	@Override
-	public VehicleGateway forVehicle() {
-		return new VehicleGatewayImpl();
-	}
+    @Override
+    public VehicleGateway forVehicle() {
+        return new VehicleGatewayImpl();
+    }
 }

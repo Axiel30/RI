@@ -14,41 +14,41 @@ import uo.ri.util.exception.NotYetImplementedException;
 
 public class CashierCrudServiceImpl implements InvoicingService {
 
-	private final CommandExecutor executor = new CommandExecutor();
+    private final CommandExecutor executor = new CommandExecutor();
 
-	@Override
-	public InvoiceDto create(List<String> workOrderIds) throws BusinessException {
-		return executor.execute(new CreateInvoice(workOrderIds));
-	}
+    @Override
+    public InvoiceDto create(List<String> workOrderIds) throws BusinessException {
+        return executor.execute(new CreateInvoice(workOrderIds));
+    }
 
-	@Override
-	public List<InvoicingWorkOrderDto> findNotInvoicedWorkOrdersByClientNif(String nif) throws BusinessException {
-		return executor.execute(new FindNotInvoicedWorkOrders(nif));
-	}
+    @Override
+    public List<InvoicingWorkOrderDto> findNotInvoicedWorkOrdersByClientNif(String nif) throws BusinessException {
+        return executor.execute(new FindNotInvoicedWorkOrders(nif));
+    }
 
-	@Override
-	public List<InvoicingWorkOrderDto> findWorkOrdersByClientNif(String nif) throws BusinessException {
-		throw new NotYetImplementedException();
-	}
+    @Override
+    public List<InvoicingWorkOrderDto> findWorkOrdersByClientNif(String nif) throws BusinessException {
+        throw new NotYetImplementedException();
+    }
 
-	@Override
-	public List<InvoicingWorkOrderDto> findWorkOrdersByPlateNumber(String plate) throws BusinessException {
-		throw new NotYetImplementedException();
-	}
+    @Override
+    public List<InvoicingWorkOrderDto> findWorkOrdersByPlateNumber(String plate) throws BusinessException {
+        throw new NotYetImplementedException();
+    }
 
-	@Override
-	public Optional<InvoiceDto> findInvoiceByNumber(Long number) throws BusinessException {
-		throw new NotYetImplementedException();
-	}
+    @Override
+    public Optional<InvoiceDto> findInvoiceByNumber(Long number) throws BusinessException {
+        throw new NotYetImplementedException();
+    }
 
-	@Override
-	public List<PaymentMeanDto> findPayMeansByClientNif(String nif) throws BusinessException {
-		throw new NotYetImplementedException();
-	}
+    @Override
+    public List<PaymentMeanDto> findPayMeansByClientNif(String nif) throws BusinessException {
+        throw new NotYetImplementedException();
+    }
 
-	@Override
-	public void settleInvoice(String invoiceId, Map<String, BigDecimal> charges) throws BusinessException {
-		throw new NotYetImplementedException();
-	}
+    @Override
+    public void settleInvoice(String invoiceId, Map<String, BigDecimal> charges) throws BusinessException {
+        throw new NotYetImplementedException();
+    }
 
 }

@@ -14,30 +14,30 @@ import uo.ri.util.exception.BusinessException;
 
 public class UpdateClient implements Command<Void> {
 
-	private final ClientGateway clients = Factories.persistence.forClient();
-	private final ClientDto dto;
+    private final ClientGateway clients = Factories.persistence.forClient();
+    private final ClientDto dto;
 
-	public UpdateClient(ClientDto dto) {
-		ClientDtoAssembler.checkHasData(dto);
-		ArgumentChecks.isNotBlank(dto.id, "The id cannot be null or blank");
-		this.dto = dto;
-	}
+    public UpdateClient(ClientDto dto) {
+        ClientDtoAssembler.checkHasData(dto);
+        ArgumentChecks.isNotBlank(dto.id, "The id cannot be null or blank");
+        this.dto = dto;
+    }
 
-	@Override
-	public Void execute() throws BusinessException {
-		Optional<ClientRecord> found = clients.findById(dto.id);
-		BusinessChecks.exists(found, "The client does not exist");
-		BusinessChecks.hasVersion(found.get().version, dto.version);
+    @Override
+    public Void execute() throws BusinessException {
+        Optional<ClientRecord> found = clients.findById(dto.id);
+        BusinessChecks.exists(found, "The client does not exist");
+        BusinessChecks.hasVersion(found.get().version, dto.version);
 
-		Optional<ClientRecord> sameNif = clients.findByNif(dto.nif);
-		BusinessChecks.isTrue(sameNif.isEmpty() || sameNif.get().id.equals(dto.id),
-				"There is already a client with that nif");
+        Optional<ClientRecord> sameNif = clients.findByNif(dto.nif);
+        BusinessChecks.isTrue(sameNif.isEmpty() || sameNif.get().id.equals(dto.id),
+            "There is already a client with that nif");
 
-		ClientRecord record = ClientDtoAssembler.toRecord(dto);
-		record.id = dto.id;
-		record.updatedAt = LocalDateTime.now();
-		clients.update(record);
-		return null;
-	}
+        ClientRecord record = ClientDtoAssembler.toRecord(dto);
+        record.id = dto.id;
+        record.updatedAt = LocalDateTime.now();
+        clients.update(record);
+        return null;
+    }
 
 }

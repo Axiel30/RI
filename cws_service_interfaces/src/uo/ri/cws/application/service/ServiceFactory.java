@@ -15,24 +15,32 @@ import uo.ri.cws.application.service.workorder.WorkOrderCrudService;
 
 public interface ServiceFactory {
 
-	// Foreman use cases
-	VehicleCrudService forVehicleCrudService();
-	ClientCrudService forClientCrudService();
-	ClientHistoryService forClientHistoryService();
-	WorkOrderCrudService forWorkOrderCrudService();
+    // Foreman use cases
+    VehicleCrudService forVehicleCrudService();
 
-	// Mechanic use cases
-	CloseWorkOrderService forClosingWorkOrder();
-	ViewAssignedWorkOrdersService forViewAssignedWorkOrdersService();
+    ClientCrudService forClientCrudService();
 
-	// Manager use cases
+    ClientHistoryService forClientHistoryService();
+
+    WorkOrderCrudService forWorkOrderCrudService();
+
+    // Mechanic use cases
+    CloseWorkOrderService forClosingWorkOrder();
+
+    ViewAssignedWorkOrdersService forViewAssignedWorkOrdersService();
+
+    // Manager use cases
     MechanicCrudService forMechanicCrudService();
+
     VehicleTypeCrudService forVehicleTypeCrudService();
+
     SparePartCrudService forSparePartCrudService();
+
     VoucherGenerationService forVoucherService();
 
     // Cashier use cases
     InvoicingService forCreateInvoiceService();
+
     PaymentMeanCrudService forPaymentMeanCrudService();
 
 }

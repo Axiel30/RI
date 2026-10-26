@@ -10,17 +10,19 @@ import uo.ri.util.assertion.ArgumentChecks;
 
 public class FindNotInvoicedWorkOrders implements Command<List<InvoicingWorkOrderDto>> {
 
-	private final WorkOrderGateway workOrders = Factories.persistence.forWorkOrder();
-	private final String nif;
+    private static final String APPROVED = "APPROVED";
 
-	public FindNotInvoicedWorkOrders(String nif) {
-		ArgumentChecks.isNotBlank(nif, "The nif cannot be null or blank");
-		this.nif = nif;
-	}
+    private final WorkOrderGateway workOrders = Factories.persistence.forWorkOrder();
+    private final String nif;
 
-	@Override
-	public List<InvoicingWorkOrderDto> execute() {
-		return InvoicingDtoAssembler.toWorkOrderDtoList(workOrders.findNotInvoicedByClientNif(nif));
-	}
+    public FindNotInvoicedWorkOrders(String nif) {
+        ArgumentChecks.isNotBlank(nif, "The nif cannot be null or blank");
+        this.nif = nif;
+    }
+
+    @Override
+    public List<InvoicingWorkOrderDto> execute() {
+        return InvoicingDtoAssembler.toWorkOrderDtoList(workOrders.findByClientNifAndState(nif, APPROVED));
+    }
 
 }

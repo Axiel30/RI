@@ -18,37 +18,37 @@ import uo.ri.util.exception.BusinessException;
 
 public class DeleteClient implements Command<Void> {
 
-	private final ClientGateway clients = Factories.persistence.forClient();
-	private final VehicleGateway vehicles = Factories.persistence.forVehicle();
-	private final PaymentMeanGateway paymentMeans = Factories.persistence.forPaymentMean();
-	private final RecommendationGateway recommendations = Factories.persistence.forRecommendation();
-	private final String nif;
+    private final ClientGateway clients = Factories.persistence.forClient();
+    private final VehicleGateway vehicles = Factories.persistence.forVehicle();
+    private final PaymentMeanGateway paymentMeans = Factories.persistence.forPaymentMean();
+    private final RecommendationGateway recommendations = Factories.persistence.forRecommendation();
+    private final String nif;
 
-	public DeleteClient(String nif) {
-		ArgumentChecks.isNotBlank(nif, "The nif cannot be null or blank");
-		this.nif = nif;
-	}
+    public DeleteClient(String nif) {
+        ArgumentChecks.isNotBlank(nif, "The nif cannot be null or blank");
+        this.nif = nif;
+    }
 
-	@Override
-	public Void execute() throws BusinessException {
-		Optional<ClientRecord> found = clients.findByNif(nif);
-		BusinessChecks.exists(found, "The client does not exist");
-		String clientId = found.get().id;
+    @Override
+    public Void execute() throws BusinessException {
+        Optional<ClientRecord> found = clients.findByNif(nif);
+        BusinessChecks.exists(found, "The client does not exist");
+        String clientId = found.get().id;
 
-		BusinessChecks.isFalse(vehicles.existsByClientId(clientId), "The client has vehicles");
-		List<PaymentMeanRecord> clientPaymentMeans = paymentMeans.findByClientId(clientId);
-		for (PaymentMeanRecord paymentMean : clientPaymentMeans) {
-			BusinessChecks.isFalse(paymentMeans.hasCharges(paymentMean.id), "The client has paid invoices");
-		}
+        BusinessChecks.isFalse(vehicles.existsByClientId(clientId), "The client has vehicles");
+        List<PaymentMeanRecord> clientPaymentMeans = paymentMeans.findByClientId(clientId);
+        for (PaymentMeanRecord paymentMean : clientPaymentMeans) {
+            BusinessChecks.isFalse(paymentMeans.hasCharges(paymentMean.id), "The client has paid invoices");
+        }
 
-		for (RecommendationRecord recommendation : recommendations.findByClientId(clientId)) {
-			recommendations.remove(recommendation.id);
-		}
-		for (PaymentMeanRecord paymentMean : clientPaymentMeans) {
-			paymentMeans.remove(paymentMean.id);
-		}
-		clients.remove(clientId);
-		return null;
-	}
+        for (RecommendationRecord recommendation : recommendations.findByClientId(clientId)) {
+            recommendations.remove(recommendation.id);
+        }
+        for (PaymentMeanRecord paymentMean : clientPaymentMeans) {
+            paymentMeans.remove(paymentMean.id);
+        }
+        clients.remove(clientId);
+        return null;
+    }
 
 }

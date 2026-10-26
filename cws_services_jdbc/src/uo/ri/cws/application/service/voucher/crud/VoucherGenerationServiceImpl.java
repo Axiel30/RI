@@ -11,26 +11,21 @@ import uo.ri.util.exception.BusinessException;
 
 public class VoucherGenerationServiceImpl implements VoucherGenerationService {
 
-	private final CommandExecutor executor = new CommandExecutor();
+    private final CommandExecutor executor = new CommandExecutor();
 
-	/**
-	 * Only the vouchers for recommendations are generated, so the amounts of
-	 * vouchers for work orders and for big invoices are always zero.
-	 */
-	@Override
-	public int[] generateVouchers() throws BusinessException {
-		int forRecommendations = executor.execute(new GenerateVouchersByRecommendations());
-		return new int[] { 0, forRecommendations, 0 };
-	}
+    @Override
+    public int[] generateVouchers() throws BusinessException {
+        return executor.execute(new GenerateVouchersByRecommendations());
+    }
 
-	@Override
-	public List<VoucherDto> findVouchersByClientNif(String nif) throws BusinessException {
-		return executor.execute(new FindVouchersByClientNif(nif));
-	}
+    @Override
+    public List<VoucherDto> findVouchersByClientNif(String nif) throws BusinessException {
+        return executor.execute(new FindVouchersByClientNif(nif));
+    }
 
-	@Override
-	public List<VoucherSummaryDto> getVoucherSummary() throws BusinessException {
-		return executor.execute(new GetVoucherSummary());
-	}
+    @Override
+    public List<VoucherSummaryDto> getVoucherSummary() throws BusinessException {
+        return executor.execute(new GetVoucherSummary());
+    }
 
 }

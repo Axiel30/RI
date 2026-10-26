@@ -9,11 +9,11 @@ import uo.ri.cws.application.service.mechanic.MechanicCrudService.MechanicDto;
 
 public class ListAllMechanics implements Command<List<MechanicDto>> {
 
-	private final MechanicGateway mechanics = Factories.persistence.forMechanic();
+    private final MechanicGateway mechanics = Factories.persistence.forMechanic();
 
-	@Override
-	public List<MechanicDto> execute() {
-		return MechanicDtoAssembler.toDtoList(mechanics.findAll());
-	}
+    @Override
+    public List<MechanicDto> execute() {
+        return MechanicDtoAssembler.toDtoList(mechanics.findAll());
+    }
 
 }

@@ -11,24 +11,24 @@ import uo.ri.util.exception.BusinessException;
 
 public class DeleteMechanic implements Command<Void> {
 
-	private final MechanicGateway mechanics = Factories.persistence.forMechanic();
-	private final WorkOrderGateway workOrders = Factories.persistence.forWorkOrder();
-	private final InterventionGateway interventions = Factories.persistence.forIntervention();
-	private final String mechanicId;
+    private final MechanicGateway mechanics = Factories.persistence.forMechanic();
+    private final WorkOrderGateway workOrders = Factories.persistence.forWorkOrder();
+    private final InterventionGateway interventions = Factories.persistence.forIntervention();
+    private final String mechanicId;
 
-	public DeleteMechanic(String mechanicId) {
-		ArgumentChecks.isNotBlank(mechanicId, "The mechanic id cannot be null or blank");
-		this.mechanicId = mechanicId;
-	}
+    public DeleteMechanic(String mechanicId) {
+        ArgumentChecks.isNotBlank(mechanicId, "The mechanic id cannot be null or blank");
+        this.mechanicId = mechanicId;
+    }
 
-	@Override
-	public Void execute() throws BusinessException {
-		BusinessChecks.exists(mechanics.findById(mechanicId), "The mechanic does not exist");
-		BusinessChecks.isFalse(workOrders.existsByMechanicId(mechanicId), "The mechanic has work orders");
-		BusinessChecks.isFalse(interventions.existsByMechanicId(mechanicId), "The mechanic has interventions");
+    @Override
+    public Void execute() throws BusinessException {
+        BusinessChecks.exists(mechanics.findById(mechanicId), "The mechanic does not exist");
+        BusinessChecks.isFalse(workOrders.existsByMechanicId(mechanicId), "The mechanic has work orders");
+        BusinessChecks.isFalse(interventions.existsByMechanicId(mechanicId), "The mechanic has interventions");
 
-		mechanics.remove(mechanicId);
-		return null;
-	}
+        mechanics.remove(mechanicId);
+        return null;
+    }
 
 }

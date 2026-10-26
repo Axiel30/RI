@@ -5,84 +5,76 @@ import java.util.List;
 import uo.ri.cws.application.service.invoice.InvoicingService.InvoiceDto;
 import uo.ri.cws.application.service.invoice.InvoicingService.PaymentMeanDto;
 import uo.ri.cws.application.service.mechanic.MechanicCrudService.MechanicDto;
+import uo.ri.cws.application.service.paymentmean.PaymentMeanCrudService.CardDto;
+import uo.ri.cws.application.service.paymentmean.VoucherGenerationService.VoucherDto;
+import uo.ri.cws.application.service.paymentmean.VoucherGenerationService.VoucherSummaryDto;
 import uo.ri.cws.application.service.vehicletype.VehicleTypeCrudService.VehicleTypeDto;
 import uo.ri.cws.application.service.workorder.WorkOrderCrudService.WorkOrderDto;
 import uo.ri.util.console.Console;
 
 public class Printer {
 
+    public static void printInvoice(InvoiceDto invoice) {
 
-	public static void printInvoice(InvoiceDto invoice) {
+        Console.printf("Invoice #: %d\n", invoice.number);
+        Console.printf("\tDate: %1$td/%1$tm/%1$tY\n", invoice.date);
+        Console.printf("\tTotal: %.2f €\n", invoice.subtotal);
+        Console.printf("\tTax amount: %s%n €\n", invoice.vatAmount);
+        Console.printf("\tTotal, tax inc.: %s €\n", invoice.total);
+        Console.printf("\tState: %s\n", invoice.state);
+    }
 
-		Console.printf("Invoice #: %d\n", 				invoice.number );
-		Console.printf("\tDate: %1$td/%1$tm/%1$tY\n", 	invoice.date);
-		Console.printf("\tTotal: %.2f €\n", 			invoice.subtotal);
-		Console.printf("\tTax amount: %s%n €\n",		invoice.vatAmount );
-		Console.printf("\tTotal, tax inc.: %s €\n", 	invoice.total );
-		Console.printf("\tState: %s\n", 				invoice.state );
-	}
+    public static void printPaymentMeans(List<PaymentMeanDto> medios) {
+        Console.println();
+        Console.println("Available payment means");
 
-	public static void printPaymentMeans(List<PaymentMeanDto> medios) {
-		Console.println();
-		Console.println("Available payment means");
+        Console.printf("\t%s \t%-8.8s \t%s \n", "Id", "Type", "Acummulated");
+        for (PaymentMeanDto medio : medios) {
+            printPaymentMean(medio);
+        }
+    }
 
-		Console.printf("\t%s \t%-8.8s \t%s \n", "Id", "Type", "Acummulated");
-		for (PaymentMeanDto medio : medios) {
-			printPaymentMean( medio );
-		}
-	}
+    private static void printPaymentMean(PaymentMeanDto medio) {
+        Console.printf("\t%s \t%-8.8s \t%s \n", medio.id, medio.getClass().getName() // not the best...
+            , medio.accumulated);
+    }
 
-	private static void printPaymentMean(PaymentMeanDto medio) {
-		Console.printf("\t%s \t%-8.8s \t%s \n"
-				, medio.id
-				, medio.getClass().getName()  // not the best...
-				, medio.accumulated
-		);
-	}
+    public static void printWorkOrder(WorkOrderDto rep) {
 
-	public static void printWorkOrder(WorkOrderDto rep) {
+        Console.printf("\t%s \t%-40.40s \t%td/%<tm/%<tY \t%-12.12s \t%.2f\n", rep.id, rep.description, rep.date,
+            rep.state, rep.amount);
+    }
 
-		Console.printf("\t%s \t%-40.40s \t%td/%<tm/%<tY \t%-12.12s \t%.2f\n"
-				, rep.id
-				, rep.description
-				, rep.date
-				, rep.state
-				, rep.amount
-		);
-	}
+    public static void printMechanic(MechanicDto m) {
 
-	public static void printMechanic(MechanicDto m) {
+        Console.printf("\t%s %-10.10s %-15.15s %-25.25s\n", m.id, m.nif, m.name, m.surname);
+    }
 
-		Console.printf("\t%s %-10.10s %-15.15s %-25.25s\n"
-				, m.id
-				, m.nif
-				, m.name
-				, m.surname
-			);
-	}
+    public static void printVehicleType(VehicleTypeDto vt) {
 
-	public static void printVehicleType(VehicleTypeDto vt) {
+        Console.printf("\t%s %-10.10s %5.2f €/hour %d\n", vt.id, vt.name, vt.pricePerHour, vt.minTrainigHours);
+    }
 
-		Console.printf("\t%s %-10.10s %5.2f €/hour %d\n"
-				, vt.id
-				, vt.name
-				, vt.pricePerHour
-				, vt.minTrainigHours
-			);
-	}
+    public static void printWorkOrderDetail(WorkOrderDto wo) {
 
+        Console.printf("%s for vehicle %s\n\t%-25.25s\n\t%tm/%<td/%<tY\n\t%s\n", wo.id, wo.vehicleId, wo.description,
+            wo.date, wo.state);
+    }
 
-	public static void printWorkOrderDetail(WorkOrderDto wo) {
+    public static void printVoucherSummary(VoucherSummaryDto s) {
+        Console.printf("\t%-10.10s \t%-15.15s \t%-20.20s \tIssued: %2d \tTotal: %6.2f €", s.nif(), s.name(),
+            s.surname(), s.totalAmount());
+    }
 
-		Console.printf("%s for vehicle %s\n\t%-25.25s\n\t%tm/%<td/%<tY\n\t%s\n",
-				wo.id
-				, wo.vehicleId
-				, wo.description
-				, wo.date
-				, wo.state
-			);
-	}
+    public static void printCard(CardDto c) {
+        Console.printf(
+            "\t[CARD]    Id: %-36.36s \tClient: %-36.36s \tNumber: %-19.19s \tType: %-10.10s \tExp: %s \tAccumulated: %8.2f €\n",
+            c.id, c.clientId, c.cardNumber, c.cardType, c.cardExpiration, c.accumulatedAmount);
+    }
 
-	
-
+    public static void printVoucher(VoucherDto v) {
+        Console.printf(
+            "\t[VOUCHER] Id: %-36.36s \tClient: %-36.36s \tCode: %-12.12s \tDesc: %-25.25s \tAvailable: %8.2f € \tAccumulated: %8.2f €\n",
+            v.id, v.clientId, v.code, v.description, v.availableAmount, v.accumulatedAmount);
+    }
 }

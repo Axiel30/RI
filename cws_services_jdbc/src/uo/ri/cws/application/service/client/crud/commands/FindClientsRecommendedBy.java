@@ -10,17 +10,17 @@ import uo.ri.util.assertion.ArgumentChecks;
 
 public class FindClientsRecommendedBy implements Command<List<ClientDto>> {
 
-	private final ClientGateway clients = Factories.persistence.forClient();
-	private final String recommenderNif;
+    private final ClientGateway clients = Factories.persistence.forClient();
+    private final String recommenderNif;
 
-	public FindClientsRecommendedBy(String recommenderNif) {
-		ArgumentChecks.isNotBlank(recommenderNif, "The recommender nif cannot be null or blank");
-		this.recommenderNif = recommenderNif;
-	}
+    public FindClientsRecommendedBy(String recommenderNif) {
+        ArgumentChecks.isNotBlank(recommenderNif, "The recommender nif cannot be null or blank");
+        this.recommenderNif = recommenderNif;
+    }
 
-	@Override
-	public List<ClientDto> execute() {
-		return ClientDtoAssembler.toDtoList(clients.findRecommendedByNif(recommenderNif));
-	}
+    @Override
+    public List<ClientDto> execute() {
+        return ClientDtoAssembler.toDtoList(clients.findRecommendedByNif(recommenderNif));
+    }
 
 }
